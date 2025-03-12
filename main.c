@@ -227,6 +227,29 @@ void editorInsertCharacter(const int x, const int y, const char c) {
 }
 
 /**
+ * @brief Append content s to the end of row
+ * @param row Row to append the content to
+ * @param s Content to append to the row
+ * @param len Size of the content to append
+ * @note This function DOES move the cursor, in the x plane.
+ */
+void editorRowAppendStr(erow *row, const char *s, const int len) {
+    // Update size
+    // TODO: Why do I need this silly 0 check?
+    row->size = (row->size == 0) ? len : row->size + len;
+
+    // Reallocate memory to make space for new content, one extra byte for the \0
+    row->chars = realloc(row->chars, sizeof(char) * (row->size + 1));
+
+    // Copy the string into the row and append \0
+    memcpy(&row->chars[row->size - len], s, len);
+    row->chars[row->size] = '\0';
+
+    // Set the cursor to the new position in the line
+    E.cur_x = row->size - len;
+}
+
+/**
  * @breif Insert a character at (x, y)
  * @param x X position, location in the row
  * @param y Y position, row to insert into
@@ -238,8 +261,11 @@ void editorRemoveCharacter(const int x, const int y) {
     // Bounds check
     if (x < 0 || x > row->size) return;
 
-    // TODO: IF x == 0, we need to delete the row
+    // TODO: If size of the row is not 0, we need to append the characters to the end of the previous row
     if (x == 0) {
+        if (row->size != 0 && y > 0) {
+            editorRowAppendStr(&E.row[y - 1], row->chars, row->size);
+        }
         editorRemoveRow(y);
         if (E.cur_y > 0) E.cur_y--;
         return;
