@@ -265,6 +265,8 @@ void editorRemoveCharacter(const int x, const int y) {
     if (x == 0) {
         if (row->size != 0 && y > 0) {
             editorRowAppendStr(&E.row[y - 1], row->chars, row->size);
+        } else {
+            E.cur_x = E.row[E.cur_y - 1].size;
         }
         editorRemoveRow(y);
         if (E.cur_y > 0) E.cur_y--;
