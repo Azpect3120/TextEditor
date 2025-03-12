@@ -294,6 +294,35 @@ void editorRemoveCharacter(const int x, const int y) {
     E.cur_x--;
 }
 
+/**
+ * Process the key presses
+ * @param ch Key pressed
+ */
+void editorProcessKeyPress(const int ch) {
+    if (ch == KEY_BACKSPACE) {
+        // TODO: Delete last character
+        editorRemoveCharacter(E.cur_x, E.cur_y);
+    } else if (ch == KEY_DOWN) {
+        if (E.cur_y < E.num_rows - 1) {
+            E.cur_y++;
+            if (E.cur_x >= E.row[E.cur_y].size) E.cur_x = E.row[E.cur_y].size;
+        }
+    } else if (ch == KEY_UP) {
+        if (E.cur_y > 0) {
+            E.cur_y--;
+            if (E.cur_x >= E.row[E.cur_y].size) E.cur_x = E.row[E.cur_y].size;
+        }
+    } else if (ch == KEY_LEFT) {
+        if (E.cur_x > 0) E.cur_x--;
+    } else if (ch == KEY_RIGHT) {
+        if (E.cur_x < E.row[E.cur_y].size) E.cur_x++;
+    } else if (ch == '\n' || ch == KEY_ENTER || ch == '\r') {
+        editorInsertNewline();
+    } else {
+        editorInsertCharacter(E.cur_x, E.cur_y, (char) ch);
+    }
+}
+
 int main () {
     E.row = NULL;
     E.num_rows = 0;
@@ -311,31 +340,7 @@ int main () {
 
     while (TRUE) {
         editorRefresh();
-
-        int ch = getch();
-        if (ch == KEY_BACKSPACE) {
-            // TODO: Delete last character
-            editorRemoveCharacter(E.cur_x, E.cur_y);
-        } else if (ch == KEY_DOWN) {
-            if (E.cur_y < E.num_rows - 1) {
-                E.cur_y++;
-                if (E.cur_x >= E.row[E.cur_y].size) E.cur_x = E.row[E.cur_y].size;
-            }
-        } else if (ch == KEY_UP) {
-            if (E.cur_y > 0) {
-                E.cur_y--;
-                if (E.cur_x >= E.row[E.cur_y].size) E.cur_x = E.row[E.cur_y].size;
-            }
-        } else if (ch == KEY_LEFT) {
-            if (E.cur_x > 0) E.cur_x--;
-        } else if (ch == KEY_RIGHT) {
-            if (E.cur_x < E.row[E.cur_y].size) E.cur_x++;
-        } else if (ch == '\n' || ch == KEY_ENTER || ch == '\r') {
-            editorInsertNewline();
-        } else {
-            // editorAppendRow("ENTER", 0);
-            editorInsertCharacter(E.cur_x, E.cur_y, (char)ch);
-        }
+        editorProcessKeyPress(wgetch(stdscr));
     }
 
     // End ncurses mode
