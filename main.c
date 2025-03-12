@@ -159,6 +159,7 @@ void editorInsertNewline() {
     E.cur_y++;
     E.cur_x = 0;
 }
+
 /**
  * @breif Insert a character c at (x, y)
  * @param x X position, location in the row
@@ -185,10 +186,47 @@ void editorInsertCharacter(const int x, const int y, const char c) {
     row->chars[x] = c;
 
     // Append null-terminator
+    // TODO: Abstract this into an update row function
     row->chars[row->size] = '\0';
 
-    // Move cursor one to the right
+    // Move the cursor one to the right
     E.cur_x++;
+}
+
+/**
+ * @breif Insert a character at (x, y)
+ * @param x X position, location in the row
+ * @param y Y position, row to insert into
+ */
+void editorRemoveCharacter(const int x, const int y) {
+    // Get the row we are working with
+    erow *row = &E.row[y];
+
+    // Bounds check
+    if (x <= 0 || x > row->size) return;
+
+    // TODO: IF x == 0, we need to delete the row
+
+    // Move memory past x, over one
+    memmove(&row->chars[x - 1], &row->chars[x], sizeof(char) * (row->size - x + 1));
+
+    // Malloc one less character in memory
+    if (x > 1) {
+        row->chars = realloc(row->chars, sizeof(char) * (row->size - 1));
+    } else {
+        row->chars = realloc(row->chars, sizeof(char));
+    }
+
+    // Decrease the size
+    row->size--;
+
+    // Append null-terminator
+    // TODO: Abstract this into an update row function
+    row->chars[row->size] = '\0';
+
+    // Move then cursor one to the left
+    E.cur_x--;
+
 }
 
 int main () {
@@ -211,6 +249,7 @@ int main () {
         int ch = getch();
         if (ch == KEY_BACKSPACE) {
             // TODO: Delete last character
+            editorRemoveCharacter(E.cur_x, E.cur_y);
         } else if (ch == KEY_DOWN) {
             if (E.cur_y < E.num_rows) {
                 E.cur_y++;
