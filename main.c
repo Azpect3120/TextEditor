@@ -1,10 +1,7 @@
-//
-// Created by azpect on 3/10/25.
-//
-
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 /*
  *
@@ -194,6 +191,7 @@ void editorInsertNewline() {
  * @param x X position, location in the row
  * @param y Y position, row to insert into
  * @param c Character to insert
+ * @note This function DOES not the cursor, once in the +x direction
  */
 void editorInsertCharacter(const int x, const int y, const char c) {
     // Bounds check
@@ -296,30 +294,42 @@ void editorRemoveCharacter(const int x, const int y) {
 
 /**
  * Process the key presses
- * @param ch Key pressed
+ * @param c Key pressed
  */
-void editorProcessKeyPress(const int ch) {
-    if (ch == KEY_BACKSPACE) {
-        // TODO: Delete last character
+void editorProcessKeyPress(const int c) {
+    // Ctrl-H is caught here
+    if (c == KEY_BACKSPACE) {
         editorRemoveCharacter(E.cur_x, E.cur_y);
-    } else if (ch == KEY_DOWN) {
+    } else if (c == KEY_DOWN) {
         if (E.cur_y < E.num_rows - 1) {
             E.cur_y++;
-            if (E.cur_x >= E.row[E.cur_y].size) E.cur_x = E.row[E.cur_y].size;
+            if (E.row != NULL && E.cur_x >= E.row[E.cur_y].size) E.cur_x = E.row[E.cur_y].size;
         }
-    } else if (ch == KEY_UP) {
+    } else if (c == KEY_UP) {
         if (E.cur_y > 0) {
             E.cur_y--;
-            if (E.cur_x >= E.row[E.cur_y].size) E.cur_x = E.row[E.cur_y].size;
+            if (E.row != NULL && E.cur_x >= E.row[E.cur_y].size) E.cur_x = E.row[E.cur_y].size;
         }
-    } else if (ch == KEY_LEFT) {
+    } else if (c == KEY_LEFT) {
         if (E.cur_x > 0) E.cur_x--;
-    } else if (ch == KEY_RIGHT) {
-        if (E.cur_x < E.row[E.cur_y].size) E.cur_x++;
-    } else if (ch == '\n' || ch == KEY_ENTER || ch == '\r') {
+    } else if (c == KEY_RIGHT) {
+        if (E.row != NULL && E.cur_x < E.row[E.cur_y].size) E.cur_x++;
+    // Ctrl-M and Ctrl-J are caught here
+    } else if (c == '\n' || c == KEY_ENTER || c == '\r') {
         editorInsertNewline();
+        // Keys between 1 and 26 SHOULD be control-characters
+    } else if (iscntrl(c) && c >= 1 && c <= 26) {
+        // Ctrl-C or Ctrl-Q
+        if (c == 3 ||c == 17) {
+            endwin(); // Not sure if I need this
+            exit(0);
+        }
+
+        // TODO: Fix this with renders, right now, they are 2 characters
+        // editorInsertCharacter(E.cur_x, E.cur_y, '^');
+        editorInsertCharacter(E.cur_x, E.cur_y, (char) (c | 0x40)); // Set the 6th bit (0x40 = 64)
     } else {
-        editorInsertCharacter(E.cur_x, E.cur_y, (char) ch);
+        editorInsertCharacter(E.cur_x, E.cur_y, (char) c);
     }
 }
 
@@ -328,12 +338,18 @@ int main () {
     E.num_rows = 0;
     E.screen_rows = LINES;
 
+
     // Initialize ncurses
     initscr();
+    // TODO: Enable this when colors are enabled
     // start_color();
-    cbreak();
+    raw();
     noecho();
     keypad(stdscr, TRUE);
+
+    // TODO: Work on colors with the renderer
+    // init_pair(1, COLOR_BLACK, COLOR_WHITE);
+
 
     editorInsertRowBelow(0, "", 0);
 
