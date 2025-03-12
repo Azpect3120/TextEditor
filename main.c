@@ -261,12 +261,12 @@ void editorRemoveCharacter(const int x, const int y) {
     // Bounds check
     if (x < 0 || x > row->size) return;
 
-    // TODO: If size of the row is not 0, we need to append the characters to the end of the previous row
+    // If at pos 0 (start of line) we need to delete the line and move the content.
     if (x == 0) {
         if (row->size != 0 && y > 0) {
             editorRowAppendStr(&E.row[y - 1], row->chars, row->size);
         } else {
-            E.cur_x = E.row[E.cur_y - 1].size;
+            if (E.row != NULL) E.cur_x = E.row[E.cur_y - 1].size;
         }
         editorRemoveRow(y);
         if (E.cur_y > 0) E.cur_y--;
