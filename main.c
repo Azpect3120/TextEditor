@@ -197,7 +197,7 @@ void editorInsertNewline() {
  */
 void editorInsertCharacter(const int x, const int y, const char c) {
     // Bounds check
-    if (y < 0 || y > E.num_rows) return;
+    if (y < 0 || y >= E.num_rows) return;
     if (x < 0 || x > E.row[y].size) return;
     
     // If we are on the last (or first, on open) create a line below
@@ -210,7 +210,7 @@ void editorInsertCharacter(const int x, const int y, const char c) {
     row->size++;
 
     // Malloc one more character in memory
-    row->chars = realloc(row->chars, sizeof(char) * row->size);
+    row->chars = realloc(row->chars, sizeof(char) * (row->size + 1));
 
     // Move memory past x, over one
     memmove(&row->chars[x + 1], &row->chars[x], sizeof(char) * (row->size - x - 1));
@@ -218,7 +218,7 @@ void editorInsertCharacter(const int x, const int y, const char c) {
     // Copy c into the x position
     row->chars[x] = c;
 
-    // Append null-terminator
+    // Append null-terminator, since we increased the size of malloc by 1, we can append to the size.
     // TODO: Abstract this into an update row function
     row->chars[row->size] = '\0';
 
