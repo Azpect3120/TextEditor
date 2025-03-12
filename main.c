@@ -196,6 +196,10 @@ void editorInsertNewline() {
  * @param c Character to insert
  */
 void editorInsertCharacter(const int x, const int y, const char c) {
+    // Bounds check
+    if (y < 0 || y > E.num_rows) return;
+    if (x < 0 || x > E.row[y].size) return;
+    
     // If we are on the last (or first, on open) create a line below
     if (y == E.num_rows) editorInsertRowBelow(y, "", 0);
 
