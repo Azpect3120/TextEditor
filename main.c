@@ -142,6 +142,35 @@ void editorInsertRowBelow(int pos, char *s, int len) {
 }
 
 /**
+ * @brief Free a row from memory.
+ * @param row Target row to free from memory.
+ */
+void editorFreeRow(erow *row) {
+    // TODO: Update this when more memory is added to the rows
+    free(row->chars);
+}
+
+/**
+ * @breif Remove the line at position pos.
+ * @param pos 0-indexed index to remove at
+ * @note This function does NOT move the cursor.
+ */
+void editorRemoveRow(const int pos) {
+    // Bounds check
+    if (E.num_rows == 1 || pos >= E.num_rows) return;
+
+    // Get the row we want to remove
+    erow *row = &E.row[pos];
+    editorFreeRow(row);
+
+    // Move the memory on top of the old row
+    memmove(&E.row[pos], &E.row[pos + 1], sizeof(erow) * (E.num_rows - pos - 1));
+
+    // Decrease the row count
+    E.num_rows--;
+}
+
+/**
  * This was taken from kilo
  * TODO: Figure out what tf this does.
  */
@@ -203,9 +232,14 @@ void editorRemoveCharacter(const int x, const int y) {
     erow *row = &E.row[y];
 
     // Bounds check
-    if (x <= 0 || x > row->size) return;
+    if (x < 0 || x > row->size) return;
 
     // TODO: IF x == 0, we need to delete the row
+    if (x == 0) {
+        editorRemoveRow(y);
+        if (E.cur_y > 0) E.cur_y--;
+        return;
+    }
 
     // Move memory past x, over one
     memmove(&row->chars[x - 1], &row->chars[x], sizeof(char) * (row->size - x + 1));
@@ -226,7 +260,6 @@ void editorRemoveCharacter(const int x, const int y) {
 
     // Move then cursor one to the left
     E.cur_x--;
-
 }
 
 int main () {
@@ -241,6 +274,7 @@ int main () {
     noecho();
     keypad(stdscr, TRUE);
 
+    editorInsertRowBelow(0, "", 0);
 
 
     while (TRUE) {
@@ -251,7 +285,7 @@ int main () {
             // TODO: Delete last character
             editorRemoveCharacter(E.cur_x, E.cur_y);
         } else if (ch == KEY_DOWN) {
-            if (E.cur_y < E.num_rows) {
+            if (E.cur_y < E.num_rows - 1) {
                 E.cur_y++;
                 if (E.cur_x >= E.row[E.cur_y].size) E.cur_x = E.row[E.cur_y].size;
             }
