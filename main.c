@@ -17,16 +17,29 @@
  */
 typedef struct erow {
     /**
-     * @breif Length of the row in the x direction. Number of characters.
+     * @breif Length of the raw characters in the x direction. Number of characters.
      * @note This value includes the '\0' terminator.
      */
     int size;
 
     /**
+     * @breif Length of the render in the x direction. Number of characters.
+     * @note This value includes the '\0' terminator.
+     */
+    int rsize;
+
+    /**
      * @brief Content stored in the row.
      * @note Length should NEVER exceed the 'size' value.
+     * @note These characters are used to generate the render, they should not be drawn directly.
      */
     char *chars;
+
+    /**
+     * @brief Content that should be drawn.
+     * @note This value should be generated based on chars, before the screen is refreshed.
+     */
+    char *render;
 } erow;
 
 /**
@@ -66,9 +79,31 @@ typedef struct Editor {
 
 
 /**
- * Global editor state.
+ * @brief Global editor state.
  */
 Editor E;
+
+/**
+ * @brief Render the row into the render field.
+ * @param row Row to render
+ * @note This function does not draw the row, it just generate the render.
+ */
+void editorRenderRow(erow *row) {
+    // First, set size to the same.
+    row->rsize = row->size;
+
+    // Free the render
+    if (row->render != NULL) free(row->render);
+
+    // Allocate new memory for the render, plus one for the \0
+    row->render = malloc(row->rsize + 1);
+
+    // TODO: Actually generate a render, for now, just copy the memory
+    memcpy(row->render, row->chars, sizeof(char) * row->rsize);
+
+    // Fill the last empty byte with the terminator
+    row->render[row->rsize] = '\0';
+}
 
 /**
  * Write a 'row' to the buffer at 'pos.'
@@ -76,8 +111,7 @@ Editor E;
  * @param pos Position in the buffer
  */
 void editorDrawRow(erow *row, int pos) {
-    // TODO: Render the row, not just print
-    mvwprintw(stdscr, pos, 0, "%s", row->chars);
+    mvwprintw(stdscr, pos, 0, "%s", row->render);
 }
 
 /**
@@ -95,6 +129,8 @@ void editorRefresh() {
     // Loop the rows, and render each row
     int i;
     for (i = 0; i < E.num_rows; i++) {
+        // TODO: Do not rerender each row, just the ones that changed. So this will require a refactor of the insert/delete
+        editorRenderRow(&E.row[i]);
         editorDrawRow(&E.row[i], i);
     }
 
@@ -144,7 +180,8 @@ void editorInsertRowBelow(int pos, char *s, int len) {
  */
 void editorFreeRow(erow *row) {
     // TODO: Update this when more memory is added to the rows
-    free(row->chars);
+    if (row->chars != NULL) free(row->chars);
+    if (row->render != NULL) free(row->render);
 }
 
 /**
@@ -295,8 +332,9 @@ void editorRemoveCharacter(const int x, const int y) {
 /**
  * Process the key presses
  * @param c Key pressed
+ * @return 1 for exit, 0 for nothing
  */
-void editorProcessKeyPress(const int c) {
+int editorProcessKeyPress(const int c) {
     // Ctrl-H is caught here
     if (c == KEY_BACKSPACE) {
         editorRemoveCharacter(E.cur_x, E.cur_y);
@@ -321,8 +359,7 @@ void editorProcessKeyPress(const int c) {
     } else if (iscntrl(c) && c >= 1 && c <= 26) {
         // Ctrl-C or Ctrl-Q
         if (c == 3 ||c == 17) {
-            endwin(); // Not sure if I need this
-            exit(0);
+            return 1;
         }
 
         // TODO: Fix this with renders, right now, they are 2 characters
@@ -331,6 +368,7 @@ void editorProcessKeyPress(const int c) {
     } else {
         editorInsertCharacter(E.cur_x, E.cur_y, (char) c);
     }
+    return 0;
 }
 
 int main () {
@@ -354,9 +392,10 @@ int main () {
     editorInsertRowBelow(0, "", 0);
 
 
-    while (TRUE) {
+    int exit = 0;
+    while (!exit) {
         editorRefresh();
-        editorProcessKeyPress(wgetch(stdscr));
+        exit = editorProcessKeyPress(wgetch(stdscr));
     }
 
     // End ncurses mode
