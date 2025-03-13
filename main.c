@@ -93,6 +93,7 @@ void editorRenderRow(erow *row) {
     row->rsize = row->size;
 
     // Free the render
+    // TODO: Might be better to realloc here, to prevent some double freeing?
     if (row->render != NULL) free(row->render);
 
     // Allocate new memory for the render, plus one for the \0
@@ -158,7 +159,18 @@ void editorInsertRowBelow(int pos, char *s, int len) {
     E.row = realloc(E.row, sizeof(erow) * (E.num_rows + 1));
 
     // Move all memory (rows) after (below) the position back one to make room for the new row.
-    memmove(&E.row[pos + 1], &E.row[pos], sizeof(erow) * (E.num_rows - pos));
+    // We don't have to increment E.num_rows before this because num_rows stores 1 higher than the index (it's not 0 indexed)
+    for (int i = E.num_rows; i > pos; i--) {
+        int oldSize = E.row[i - 1].size;
+        char *oldChars = E.row[i - 1].chars;
+
+        E.row[i].chars = malloc(oldSize + 1);
+        memcpy(E.row[i].chars, oldChars, oldSize);
+        E.row[i].chars[oldSize] = '\0';
+        E.row[i].size = oldSize;
+
+        free(oldChars);
+    }
 
     // Allocate memory for the new row, of size len + 1
     // Plus one is for the '\0'
@@ -181,7 +193,8 @@ void editorInsertRowBelow(int pos, char *s, int len) {
 void editorFreeRow(erow *row) {
     // TODO: Update this when more memory is added to the rows
     if (row->chars != NULL) free(row->chars);
-    if (row->render != NULL) free(row->render);
+    // TODO: This was causing a double free when backspace pressed at x = 0
+    // if (row->render != NULL) free(row->render);
 }
 
 /**
