@@ -10,17 +10,17 @@ int editorProcessKeyPress(Editor *E, const int c) {
     } else if (c == KEY_DOWN) {
         if (E->cur_y < E->num_rows - 1) {
             E->cur_y++;
-            if (E->row != NULL && E->cur_x >= E->row[E->cur_y].size) E->cur_x = E->row[E->cur_y].size;
+            if (E->row != NULL && E->cur_x >= E->row[E->cur_y].rsize) E->cur_x = E->row[E->cur_y].rsize;
         }
     } else if (c == KEY_UP) {
         if (E->cur_y > 0) {
             E->cur_y--;
-            if (E->row != NULL && E->cur_x >= E->row[E->cur_y].size) E->cur_x = E->row[E->cur_y].size;
+            if (E->row != NULL && E->cur_x >= E->row[E->cur_y].rsize) E->cur_x = E->row[E->cur_y].rsize;
         }
     } else if (c == KEY_LEFT) {
         if (E->cur_x > 0) E->cur_x--;
     } else if (c == KEY_RIGHT) {
-        if (E->row != NULL && E->cur_x < E->row[E->cur_y].size) E->cur_x++;
+        if (E->row != NULL && E->cur_x < E->row[E->cur_y].rsize) E->cur_x++;
     // Ctrl-M and Ctrl-J are caught here
     } else if (c == '\n' || c == KEY_ENTER || c == '\r') {
         editorInsertNewline(E);
@@ -29,6 +29,12 @@ int editorProcessKeyPress(Editor *E, const int c) {
         // Ctrl-C or Ctrl-Q
         if (c == 3 ||c == 17) {
             return 1;
+        }
+
+        // Catch Ctrl-I: tab for some reason...
+        if (c == 9) {
+            editorInsertCharacter(E, E->cur_x, E->cur_y, (char) c);
+            return 0;
         }
 
         // TODO: Fix this with renders, right now, they are 2 characters

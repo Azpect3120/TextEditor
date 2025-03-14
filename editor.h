@@ -1,6 +1,8 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
+#define TAB_STOP 4
+
 /**
  * Editor row struct
  */
@@ -63,6 +65,12 @@ typedef struct Editor {
      * @note 0-indexed, where 0 is the top.
      */
     int cur_y;
+
+    /**
+     * @brief Current x position of the cursor in the render.
+     * @note 0-indexed, where 0 is the left.
+     */
+    int ren_x;
 
 } Editor;
 

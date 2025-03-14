@@ -25,8 +25,11 @@ void editorRefresh(Editor *E) {
     // Check if the y is out of bounds
     if (E->cur_y >= E->num_rows) E->cur_y == E->num_rows - 1;
 
+    // Calculate render cursor position
+    E->ren_x = editorRowGetRenderX(&E->row[E->cur_y], E->cur_x);
+
     // Move the cursor to the proper position defined in the state
-    wmove(stdscr, E->cur_y, E->cur_x);
+    wmove(stdscr, E->cur_y, E->ren_x);
 }
 
 void initEditor(Editor *E) {

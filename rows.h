@@ -63,7 +63,7 @@ void rowAppendStr(Editor *E, erow *row, const char *s, const int len);
  * @param x X position, location in the row
  * @param y Y position, row to insert into
  * @param c Character to insert
- * @note This function DOES not the cursor, once in the +x direction
+ * @note This function DOES move the cursor, in the +x direction
  */
 void editorInsertCharacter(Editor *E, const int x, const int y, const char c);
 
@@ -74,4 +74,13 @@ void editorInsertCharacter(Editor *E, const int x, const int y, const char c);
  * @param y Y position, row to insert into
  */
 void editorRemoveCharacter(Editor *E, const int x, const int y);
+
+/**
+ * Compute the position of the cursor in the render based on the current position.
+ * @param row Row to generate render position for.
+ * @param cur_x Current position of the cursor in the x direction.
+ * @return ren_x position
+ */
+int editorRowGetRenderX(erow *row, int cur_x);
+
 #endif //ROWS_H

@@ -19,21 +19,31 @@ void editorRemoveRow(Editor *E, const int pos) {
 }
 
 void editorRenderRow(erow *row) {
-    // First, set size to the same.
-    row->rsize = row->size;
-
     // Free the render
-    // TODO: Might be better to realloc here, to prevent some double freeing?
+    // TODO: Might be better to reallocate here, to prevent some double freeing?
     if (row->render != NULL) free(row->render);
 
-    // Allocate new memory for the render, plus one for the \0
-    row->render = malloc(row->rsize + 1);
+    // Calculate the number of tabs before allocation
+    int tabs = 0;
+    for (int i = 0; i < row->size; i++) if (row->chars[i] == '\t') tabs++;
 
-    // TODO: Actually generate a render, for now, just copy the memory
-    memcpy(row->render, row->chars, sizeof(char) * row->rsize);
+    // Allocate new memory for the render, plus one for the '\0'
+    row->render = malloc(row->size + tabs * (TAB_STOP - 1) + 1);
 
-    // Fill the last empty byte with the terminator
-    row->render[row->rsize] = '\0';
+    int idx = 0;
+    for (int i = 0; i < row->size; i++) {
+        // Right now, the only difference between render and chars is the tabs
+        if (row->chars[i] == '\t') {
+            row->render[idx++] = ' ';
+            while (idx % TAB_STOP != 0) row->render[idx++] = ' ';
+        } else {
+            row->render[idx++] = row->chars[i];
+        }
+    }
+
+    // Update render size and append terminator
+    row->render[idx] = '\0';
+    row->rsize = idx;
 }
 
 void editorDrawRow(erow *row, int pos) {
@@ -41,7 +51,6 @@ void editorDrawRow(erow *row, int pos) {
 }
 
 void editorFreeRow(erow *row) {
-    // TODO: Update this when more memory is added to the rows
     if (row->chars != NULL) free(row->chars);
     // TODO: This was causing a double free when backspace pressed at x = 0
     // if (row->render != NULL) free(row->render);
@@ -118,7 +127,7 @@ void editorInsertCharacter(Editor *E, const int x, const int y, const char c) {
     if (y < 0 || y >= E->num_rows) return;
     if (x < 0 || x > E->row[y].size) return;
     
-    // If we are on the last (or first, on open) create a line below
+    // If we are on the last (or first, on open), create a line below
     if (y == E->num_rows) editorInsertRowBelow(E, y, "", 0);
 
     // Get the row we are working with
@@ -151,7 +160,7 @@ void editorRemoveCharacter(Editor *E, const int x, const int y) {
     // Bounds check
     if (x < 0 || x > row->size) return;
 
-    // If at pos 0 (start of line) we need to delete the line and move the content.
+    // If at pos 0 (start of line), we need to delete the line and move the content.
     if (x == 0) {
         if (row->size != 0 && y > 0) {
             rowAppendStr(E, &E->row[y - 1], row->chars, row->size);
@@ -166,12 +175,7 @@ void editorRemoveCharacter(Editor *E, const int x, const int y) {
     // Move memory past x, over one
     memmove(&row->chars[x - 1], &row->chars[x], sizeof(char) * (row->size - x + 1));
 
-    // Malloc one less character in memory
-    if (x > 1) {
-        row->chars = realloc(row->chars, sizeof(char) * (row->size - 1));
-    } else {
-        row->chars = realloc(row->chars, sizeof(char));
-    }
+    // We don't need to malloc less space, we just wait for the memory to be free when another change takes place
 
     // Decrease the size
     row->size--;
@@ -182,5 +186,14 @@ void editorRemoveCharacter(Editor *E, const int x, const int y) {
 
     // Move then cursor one to the left
     E->cur_x--;
+}
+
+int editorRowGetRenderX(erow *row, int cur_x) {
+    int rx = 0;
+    for (int i = 0; i < cur_x; i++) {
+        if (row->chars[i] == '\t') rx += (TAB_STOP - 1) - (rx % TAB_STOP);
+        rx++;
+    }
+    return rx;
 }
 
