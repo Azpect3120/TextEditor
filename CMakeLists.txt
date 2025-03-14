@@ -7,7 +7,13 @@ find_package(Curses REQUIRED)
 
 if (CURSES_FOUND)
     include_directories(${CURSES_INCLUDE_DIRS})
-    add_executable(TextEditor main.c)
+    add_executable(TextEditor main.c
+            rows.c
+            rows.h
+            editor.c
+            editor.h
+            keymaps.c
+            keymaps.h)
     target_link_libraries(TextEditor ${CURSES_LIBRARIES})
 else()
     message(FATAL_ERROR "ncurses not found")
