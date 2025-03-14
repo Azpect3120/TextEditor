@@ -22,6 +22,9 @@ void editorRefresh(Editor *E) {
         mvwprintw(stdscr, i, 0, "~");
     }
 
+    // Check if the y is out of bounds
+    if (E->cur_y >= E->num_rows) E->cur_y == E->num_rows - 1;
+
     // Move the cursor to the proper position defined in the state
     wmove(stdscr, E->cur_y, E->cur_x);
 }
