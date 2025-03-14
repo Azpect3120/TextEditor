@@ -7,7 +7,7 @@
 
 void editorRemoveRow(Editor *E, const int pos) {
     // Bounds check
-    if (E->num_rows == 1 || pos >= E->num_rows) return;
+    if (E->num_rows == 1 || pos >= E->num_rows || pos == 0) return;
 
     // Get the row we want to remove
     erow *row = &E->row[pos];
