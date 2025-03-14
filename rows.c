@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <ncurses.h>
 
+// TODO: Check for errors in allocation
+
 void editorRemoveRow(Editor *E, const int pos) {
     // Bounds check
     if (E->num_rows == 1 || pos >= E->num_rows) return;
@@ -92,18 +94,40 @@ void editorInsertRowBelow(Editor *E, int pos, char *s, int len) {
 }
 
 void editorInsertNewline(Editor *E) {
+    // Calculate previous line indentation
+    int tabs = 0;
+    if (E->cur_y > 0) {
+        for (int i = 0; i < E->row[E->cur_y].size; i++)
+            if (E->row[E->cur_y].chars[i] == '\t') tabs++;
+            else break;
+    }
+
+    // Create newline string, +1 for null terminator
+    char *indent = (char *)malloc((tabs + 1) * sizeof(char));
+    for (int i = 0; i < tabs; i++) indent[i] = '\t';
+    indent[tabs] = '\0';
+
     if (E->cur_x == 0) {
-        editorInsertRowBelow(E, E->cur_y, "", 0);
+        editorInsertRowBelow(E, E->cur_y, indent, tabs);
     } else {
         erow *row = &E->row[E->cur_y];
-        editorInsertRowBelow(E, E->cur_y + 1, &row->chars[E->cur_x], row->size - E->cur_x);
+        // Create the new string with the appended tabs, +1 for null terminator
+        const int len = tabs + (row->size - E->cur_x);
+        char *newChars = (char *)malloc((len + 1) * sizeof(char));
+
+        // Concat the strings together
+        strcpy(newChars, indent);
+        strcat(newChars, &row->chars[E->cur_x]);
+        newChars[len] = '\0';
+
+        editorInsertRowBelow(E, E->cur_y + 1, newChars, len);
         row = &E->row[E->cur_y];
         row->size = E->cur_x;
-        row->chars[row->size] = '\0';
     }
 
     E->cur_y++;
-    E->cur_x = 0;
+    E->cur_x = tabs;
+    free(indent);
 }
 
 void rowAppendStr(Editor *E, erow *row, const char *s, const int len) {

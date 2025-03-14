@@ -24,7 +24,7 @@ int editorProcessKeyPress(Editor *E, const int c) {
     // Ctrl-M and Ctrl-J are caught here
     } else if (c == '\n' || c == KEY_ENTER || c == '\r') {
         editorInsertNewline(E);
-        // Keys between 1 and 26 SHOULD be control-characters
+    // Keys between 1 and 26 SHOULD be control-characters
     } else if (iscntrl(c) && c >= 1 && c <= 26) {
         // Ctrl-C or Ctrl-Q
         if (c == 3 ||c == 17) {
