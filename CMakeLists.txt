@@ -13,7 +13,8 @@ if (CURSES_FOUND)
             editor.c
             editor.h
             keymaps.c
-            keymaps.h)
+            keymaps.h
+    )
     target_link_libraries(TextEditor ${CURSES_LIBRARIES})
 else()
     message(FATAL_ERROR "ncurses not found")

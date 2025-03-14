@@ -2,6 +2,7 @@
 #define EDITOR_H
 
 #define TAB_STOP 4
+#define MESSAGE_TIMEOUT 5
 
 /**
  * Editor row struct
@@ -55,6 +56,11 @@ typedef struct Editor {
     int screen_rows;
 
     /**
+     * @breif Number of columns that can be displayed on the screen.
+     */
+    int screen_cols;
+
+    /**
      * @breif Current x position of the cursor.
      * @note 0-indexed, where 0 is the left.
      */
@@ -72,6 +78,16 @@ typedef struct Editor {
      */
     int ren_x;
 
+    /**
+     * @breif Message to display in the status bar.
+     */
+    char *status_msg;
+
+    /**
+     * @brief Stores the time of the last update to the status message.
+     * @note Used to update the status message on refresh.
+     */
+    int status_msg_time;
 } Editor;
 
 /**
@@ -87,5 +103,19 @@ void editorRefresh(Editor *E);
  * @param E Editor state
  */
 void initEditor(Editor *E);
+
+/**
+ * Draw the status bar with the message stored in the editor state.
+ * @param E Editor state
+ */
+void editorDrawStatusBar(Editor *E);
+
+/**
+ * Update the message in the status bar.
+ * @param E Editor state.
+ * @param fmt Format specifier.
+ * @param ... Optional arguments for the fmt.
+ */
+void editorSetStatusMessage(Editor *E, char *fmt, ...);
 
 #endif //EDITOR_H

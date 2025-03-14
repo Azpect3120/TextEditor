@@ -22,16 +22,20 @@ int main () {
     // Initialize ncurses
     initscr();
     // TODO: Enable this when colors are enabled
-    // start_color();
+    start_color();
     raw();
     noecho();
     keypad(stdscr, TRUE);
 
     // TODO: Work on colors with the renderer
-    // init_pair(1, COLOR_BLACK, COLOR_WHITE);
+    init_pair(1, COLOR_BLACK, COLOR_WHITE);
+
+
+    // Set default colors
+    assume_default_colors(COLOR_WHITE, COLOR_BLACK);
+    use_default_colors();
 
     editorInsertRowBelow(&E, 0, "", 0);
-
 
     int exit = 0;
     while (!exit) {
@@ -39,6 +43,8 @@ int main () {
         exit = editorProcessKeyPress(&E, wgetch(stdscr));
     }
 
+
+    // TODO: Clear editor memory
     // End ncurses mode
     endwin();
     return 0;
