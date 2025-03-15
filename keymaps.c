@@ -4,6 +4,8 @@
 #include <ctype.h>
 
 int editorProcessKeyPress(Editor *E, const int c) {
+    editorSetStatusMessage(E, "Key pressed: %c (%d)", c, c);
+
     // Ctrl-H is caught here
     if (c == KEY_BACKSPACE) {
         editorRemoveCharacter(E, E->cur_x, E->cur_y);
