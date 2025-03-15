@@ -182,7 +182,7 @@ void editorRemoveCharacter(Editor *E, const int x, const int y) {
     erow *row = &E->row[y];
 
     // Bounds check
-    if (x < 0 || x > row->size) return;
+    if (x < 0 || x > row->size || (x == 0 && y == 0)) return;
 
     // If at pos 0 (start of line), we need to delete the line and move the content.
     if (x == 0) {
