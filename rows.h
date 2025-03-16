@@ -28,10 +28,11 @@ void editorDrawRow(erow *row, int pos);
 
 /**
  * Draws the row number to the row at pos.
+ * @param cur_y Current y position
  * @param pos Position in the buffer
  * @note Pos should be the index of the row, one should be added for the print-out.
  */
-void editorDrawRowNum(int pos);
+void editorDrawRowNum(int cur_y, int pos);
 
 /**
  * @brief Free a row from memory.

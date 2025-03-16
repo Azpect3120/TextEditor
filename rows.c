@@ -52,12 +52,23 @@ void editorDrawRow(erow *row, int pos) {
     mvwprintw(stdscr, pos, NUM_COL_SIZE, "%s", row->render);
 }
 
-// TODO: Implement relative line numbers.
-void editorDrawRowNum(int pos) {
+void editorDrawRowNum(int cur_y, int pos) {
+    int line_num = 0;
     char fmt[10];
-    snprintf(fmt, sizeof(fmt), "%%%dd ", NUM_COL_SIZE - 1);
+
+    if (RELATIVE_NUM) {
+        if (cur_y == pos) line_num = pos + 1;
+        else if (cur_y > pos) line_num = cur_y - pos;
+        else line_num = pos - cur_y;
+    } else {
+        line_num = pos + 1;
+    }
+
+    if (cur_y == pos) snprintf(fmt, sizeof(fmt), "%%%dd  ", NUM_COL_SIZE - 2);
+    else snprintf(fmt, sizeof(fmt), "%%%dd ", NUM_COL_SIZE - 1);
+
     attron(COLOR_PAIR(2) | A_BOLD);
-    mvwprintw(stdscr, pos, 0, fmt, pos + 1);
+    mvwprintw(stdscr, pos, 0, fmt, line_num);
     attroff(COLOR_PAIR(2) | A_BOLD);
 }
 
