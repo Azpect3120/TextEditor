@@ -19,6 +19,7 @@ void editorRefresh(Editor *E) {
         // TODO: Do not rerender each row, just the ones that changed. So this will require a refactor of the insert/delete
         editorRenderRow(&E->row[i]);
         editorDrawRow(&E->row[i], i);
+        editorDrawRowNum(i);
     }
 
     // Loop over unused rows except last one

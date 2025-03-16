@@ -29,6 +29,7 @@ int main () {
 
     // TODO: Work on colors with the renderer
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
+    init_pair(2, COLOR_YELLOW, COLOR_BLACK);
 
 
     // Set default colors

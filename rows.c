@@ -49,7 +49,16 @@ void editorRenderRow(erow *row) {
 }
 
 void editorDrawRow(erow *row, int pos) {
-    mvwprintw(stdscr, pos, 0, "%s", row->render);
+    mvwprintw(stdscr, pos, NUM_COL_SIZE, "%s", row->render);
+}
+
+// TODO: Implement relative line numbers.
+void editorDrawRowNum(int pos) {
+    char fmt[10];
+    snprintf(fmt, sizeof(fmt), "%%%dd ", NUM_COL_SIZE - 1);
+    attron(COLOR_PAIR(2) | A_BOLD);
+    mvwprintw(stdscr, pos, 0, fmt, pos + 1);
+    attroff(COLOR_PAIR(2) | A_BOLD);
 }
 
 void editorFreeRow(erow *row) {
@@ -218,6 +227,6 @@ int editorRowGetRenderX(erow *row, int cur_x) {
         if (row->chars[i] == '\t') rx += (TAB_STOP - 1) - (rx % TAB_STOP);
         rx++;
     }
-    return rx;
+    return rx + NUM_COL_SIZE;
 }
 

@@ -22,8 +22,16 @@ void editorRenderRow(erow *row);
  * Write a 'row' to the buffer at 'pos.'
  * @param row Row to render
  * @param pos Position in the buffer
+ * @note The position will be offset by the NUM_COL_SIZE
  */
 void editorDrawRow(erow *row, int pos);
+
+/**
+ * Draws the row number to the row at pos.
+ * @param pos Position in the buffer
+ * @note Pos should be the index of the row, one should be added for the print-out.
+ */
+void editorDrawRowNum(int pos);
 
 /**
  * @brief Free a row from memory.
@@ -82,5 +90,6 @@ void editorRemoveCharacter(Editor *E, const int x, const int y);
  * @return ren_x position
  */
 int editorRowGetRenderX(erow *row, int cur_x);
+
 
 #endif //ROWS_H

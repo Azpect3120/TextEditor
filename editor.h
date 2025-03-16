@@ -3,6 +3,7 @@
 
 #define TAB_STOP 4
 #define MESSAGE_TIMEOUT 5
+#define NUM_COL_SIZE 4
 
 /**
  * Editor row struct
