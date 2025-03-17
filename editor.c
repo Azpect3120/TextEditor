@@ -23,7 +23,7 @@ void editorRefresh(Editor *E) {
     }
 
     // Loop over unused rows except last one
-    for (i = E->num_rows; i < E->screen_rows - 1; i++) {
+    for (i = E->num_rows; i < E->screen_rows - 2; i++) {
         mvwprintw(stdscr, i, 0, "~");
     }
 
@@ -33,8 +33,11 @@ void editorRefresh(Editor *E) {
     // Calculate render cursor position
     E->ren_x = editorRowGetRenderX(&E->row[E->cur_y], E->cur_x);
 
-    // Draw status bar
+    // Draw status bar and message bar
     editorDrawStatusBar(E);
+    editorDrawMessage(E);
+
+    if (E->cur_y >= E->screen_rows - 2) E->cur_y = E->screen_rows - 3;
 
     // Move the cursor to the proper position defined in the state
     wmove(stdscr, E->cur_y, E->ren_x);
@@ -45,12 +48,10 @@ void editorDrawStatusBar(Editor *E) {
     char status_l[160], status_r[20];
 
     int len_l = snprintf(status_l, sizeof(status_l),
-        "%.10s %.20s - %s %s",
+        "%.10s %.20s - %s",
         "INSERT",
         "[No Name]",
-        "(modified)",
-        (E->status_msg != NULL && time(NULL) - E->status_msg_time < MESSAGE_TIMEOUT) ?
-            E->status_msg : ""
+        "(modified)"
         );
     int len_r = snprintf(status_r, sizeof(status_r), "%s | %d:%d ", "no ft", E->cur_y + 1, E->ren_x + 1);
 
@@ -68,10 +69,15 @@ void editorDrawStatusBar(Editor *E) {
     status_f[E->screen_cols] = '\0';
 
     attron(COLOR_PAIR(1));
-    mvwprintw(stdscr, E->screen_rows - 1, 0, "%s", status_f);
+    mvwprintw(stdscr, E->screen_rows - 2, 0, "%s", status_f);
     attroff(COLOR_PAIR(1));
 
     free(status_f);
+}
+
+void editorDrawMessage(Editor *E) {
+    if (E->message != (NULL) && time(NULL) - E->message_time < MESSAGE_TIMEOUT)
+        mvwprintw(stdscr, E->screen_rows - 1, 0, "%s", E->message);
 }
 
 void editorSetStatusMessage(Editor *E, char *fmt, ...) {
@@ -84,10 +90,10 @@ void editorSetStatusMessage(Editor *E, char *fmt, ...) {
 
     message[79] = '\0';
 
-    E->status_msg = realloc(E->status_msg, sizeof(char) * (len + 1));
-    strcpy(E->status_msg, message);
+    E->message = realloc(E->message, sizeof(char) * (len + 1));
+    strcpy(E->message, message);
 
-    E->status_msg_time = time(NULL);
+    E->message_time = time(NULL);
     free(message);
 }
 

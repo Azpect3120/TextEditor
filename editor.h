@@ -81,15 +81,15 @@ typedef struct Editor {
     int ren_x;
 
     /**
-     * @breif Message to display in the status bar.
+     * @breif Message to display in the message bar.
      */
-    char *status_msg;
+    char *message;
 
     /**
-     * @brief Stores the time of the last update to the status message.
-     * @note Used to update the status message on refresh.
+     * @brief Stores the time of the last update to the message.
+     * @note Used to update the message on refresh.
      */
-    int status_msg_time;
+    int message_time;
 } Editor;
 
 /**
@@ -107,10 +107,12 @@ void editorRefresh(Editor *E);
 void initEditor(Editor *E);
 
 /**
- * Draw the status bar with the message stored in the editor state.
+ * Draw the status bar with the content pre-defined. No message here.
  * @param E Editor state
  */
 void editorDrawStatusBar(Editor *E);
+
+void editorDrawMessage(Editor *E);
 
 /**
  * Update the message in the status bar.
@@ -119,5 +121,6 @@ void editorDrawStatusBar(Editor *E);
  * @param ... Optional arguments for the fmt.
  */
 void editorSetStatusMessage(Editor *E, char *fmt, ...);
+
 
 #endif //EDITOR_H
