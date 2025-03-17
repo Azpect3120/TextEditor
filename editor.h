@@ -5,6 +5,7 @@
 #define MESSAGE_TIMEOUT 5
 #define NUM_COL_SIZE 5
 #define RELATIVE_NUM true
+#define SCROLL_OFF 8
 
 /**
  * Editor row struct
@@ -81,6 +82,12 @@ typedef struct Editor {
     int ren_x;
 
     /**
+     * @brief Current y position where the user is scrolled too
+     * @note 0-indexed, where 0 is the top.
+     */
+    int rowoff;
+
+    /**
      * @breif Message to display in the message bar.
      */
     char *message;
@@ -107,13 +114,21 @@ typedef struct Editor {
 void editorRefresh(Editor *E);
 
 /**
- * Initialize the editor state object.
+ * @brief Handles the editors scroll functionality. As well as x-position.
+ * @param E Editor state
+ * @note Scroll-off constant is used to determine the scroll.
+ * @note This function DOES NOT move the cursor, just updates the state.
+ */
+void editorScroll(Editor *E);
+
+/**
+ * @brief Initialize the editor state object.
  * @param E Editor state
  */
 void initEditor(Editor *E);
 
 /**
- * Draw the status bar with the content pre-defined. No message here.
+ * @brief Draw the status bar with the content pre-defined. No message here.
  * @param E Editor state
  * @note This will be called on each render.
  * @note This function will move the cursor, so it should be moved back after
@@ -122,7 +137,7 @@ void initEditor(Editor *E);
 void editorDrawStatusBar(Editor *E);
 
 /**
- * Draw the message bar with the content in the editor state.
+ * @brief Draw the message bar with the content in the editor state.
  * @param E Editor state
  * @note This will be called on each render.
  * @note This function will move the cursor, so it should be moved back after
@@ -131,7 +146,7 @@ void editorDrawStatusBar(Editor *E);
 void editorDrawMessage(Editor *E);
 
 /**
- * Update the message in the status bar.
+ * @brief Update the message in the status bar.
  * @param E Editor state.
  * @param fmt Format specifier.
  * @param ... Optional arguments for the fmt.
@@ -141,14 +156,14 @@ void editorSetStatusMessage(Editor *E, char *fmt, ...);
 // TODO: MOVE THESE TO A FILES.C file
 
 /**
- * Open a file and load it's content into the editor.
+ * @brief Open a file and load it's content into the editor.
  * @param E Editor state
  * @param filename Name of the file to open
  */
 void editorOpenFile(Editor *E, char *filename);
 
 /**
- * Save the content in the editor to the file that is opened.
+ * @brief Save the content in the editor to the file that is opened.
  * @param E Editor state
  * TODO: Handle NULL filename, for now, it skips.
  */

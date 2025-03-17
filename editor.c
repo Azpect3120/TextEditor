@@ -20,25 +20,24 @@ void editorRefresh(Editor *E) {
     // Clear the screen before new render
     wclear(stdscr);
 
+    // Update the scroll and cursor position
+    editorScroll(E);
+
     // Loop the rows, and render each row
-    int i;
-    for (i = 0; i < E->num_rows; i++) {
-        // TODO: Do not rerender each row, just the ones that changed. So this will require a refactor of the insert/delete
-        editorRenderRow(&E->row[i]);
-        editorDrawRow(&E->row[i], i);
-        editorDrawRowNum(E->cur_y, i);
+    int y;
+    for (y = E->rowoff; y < E->screen_rows - 2 + E->rowoff; y++) {
+        editorDrawRow(&E->row[y], y);
+        editorDrawRowNum(E->cur_y, y);
+
     }
 
     // Loop over unused rows except last one
-    for (i = E->num_rows; i < E->screen_rows - 2; i++) {
-        mvwprintw(stdscr, i, 0, "~");
+    for (y = E->num_rows; y < E->screen_rows - 2; y++) {
+        mvwprintw(stdscr, y, 0, "~");
     }
 
     // Check if the y is out of bounds
     if (E->cur_y >= E->num_rows) E->cur_y == E->num_rows - 1;
-
-    // Calculate render cursor position
-    E->ren_x = editorRowGetRenderX(&E->row[E->cur_y], E->cur_x);
 
     // Draw status bar and message bar
     editorDrawStatusBar(E);
@@ -48,6 +47,26 @@ void editorRefresh(Editor *E) {
 
     // Move the cursor to the proper position defined in the state
     wmove(stdscr, E->cur_y, E->ren_x);
+}
+
+void editorScroll (Editor *E) {
+    // Calculate render cursor position
+    E->ren_x = 0;
+    if (E->cur_y < E->num_rows)
+        E->ren_x = editorRowGetRenderX(&E->row[E->cur_y], E->cur_x);
+
+    // if (E->cur_y < E->rowoff) E->rowoff = E->cur_y;
+
+    // if (E->cur_y + SCROLL_OFF >= E->rowoff + E->screen_rows) {
+    //     E->rowoff = E->cur_y - E->screen_rows;
+    // }
+
+    if (E->cur_y >= (E->screen_rows - 2 - SCROLL_OFF))
+        E->rowoff = E->cur_y - (E->screen_rows - 2) + SCROLL_OFF;
+
+    // TODO: Column scrolling
+
+    editorSetStatusMessage(E, "ren_x %d cur_y %d rowoff %d screen_rows %d", E->ren_x, E->cur_y, E->rowoff, E->screen_rows);
 }
 
 void editorDrawStatusBar(Editor *E) {
@@ -123,6 +142,9 @@ void initEditor(Editor *E) {
     E->row = NULL;
     E->filename = NULL;
     E->num_rows = 0;
+    E->rowoff = 0;
+    E->cur_x = 0;
+    E->cur_y = 0;
     E->screen_rows = LINES;
     E->screen_cols = COLS;
 

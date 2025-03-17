@@ -4,20 +4,22 @@
 #include <ctype.h>
 
 int editorProcessKeyPress(Editor *E, const int c) {
-    editorSetStatusMessage(E, "Key pressed: '%c' (%d)", (c == '\n') ? ' ' : c, c);
+    // editorSetStatusMessage(E, "Key pressed: '%c' (%d)", (c == '\n') ? ' ' : c, c);
 
     // Ctrl-H is caught here
     if (c == KEY_BACKSPACE) {
         editorRemoveCharacter(E, E->cur_x, E->cur_y);
     } else if (c == KEY_DOWN) {
-        if (E->cur_y < E->num_rows - 1 && E->cur_y < E->screen_rows - 3) {
+        if (E->cur_y < E->num_rows) {
             E->cur_y++;
-            if (E->row != NULL && E->cur_x >= E->row[E->cur_y].size) E->cur_x = E->row[E->cur_y].size;
+            if (E->row != NULL && E->cur_x >= E->row[E->cur_y].size)
+                E->cur_x = E->row[E->cur_y].size;
         }
     } else if (c == KEY_UP) {
         if (E->cur_y > 0) {
             E->cur_y--;
-            if (E->row != NULL && E->cur_x >= E->row[E->cur_y].size) E->cur_x = E->row[E->cur_y].size;
+            if (E->row != NULL && E->cur_x >= E->row[E->cur_y].size)
+                E->cur_x = E->row[E->cur_y].size;
         }
     } else if (c == KEY_LEFT) {
         if (E->cur_x > 0) E->cur_x--;

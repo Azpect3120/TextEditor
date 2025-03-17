@@ -49,6 +49,8 @@ void editorRenderRow(erow *row) {
 }
 
 void editorDrawRow(erow *row, int pos) {
+    // Render the row if it doesn't exist, should only have to happen on load.
+    if (row->render == NULL) editorRenderRow(row);
     mvwprintw(stdscr, pos, NUM_COL_SIZE, "%s", row->render);
 }
 
@@ -164,6 +166,9 @@ void rowAppendStr(Editor *E, erow *row, const char *s, const int len) {
 
     // Set the cursor to the new position in the line
     E->cur_x = row->size - len;
+
+    // Update the render in the row
+    editorRenderRow(row);
 }
 
 void editorInsertCharacter(Editor *E, const int x, const int y, const char c) {
@@ -195,6 +200,9 @@ void editorInsertCharacter(Editor *E, const int x, const int y, const char c) {
 
     // Move the cursor one to the right
     E->cur_x++;
+
+    // Update the render in the row
+    editorRenderRow(row);
 }
 
 void editorRemoveCharacter(Editor *E, const int x, const int y) {
@@ -230,6 +238,9 @@ void editorRemoveCharacter(Editor *E, const int x, const int y) {
 
     // Move then cursor one to the left
     E->cur_x--;
+
+    // Update the render in the row
+    editorRenderRow(row);
 }
 
 int editorRowGetRenderX(erow *row, int cur_x) {
