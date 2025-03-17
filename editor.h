@@ -109,9 +109,15 @@ void initEditor(Editor *E);
 /**
  * Draw the status bar with the content pre-defined. No message here.
  * @param E Editor state
+ * @note This will be called on each render.
  */
 void editorDrawStatusBar(Editor *E);
 
+/**
+ * Draw the message bar with the content in the editor state.
+ * @param E Editor state
+ * @note This will be called on each render.
+ */
 void editorDrawMessage(Editor *E);
 
 /**
