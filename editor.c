@@ -45,7 +45,13 @@ void editorRefresh(Editor *E) {
 
 void editorDrawStatusBar(Editor *E) {
     char *status_f = (char *)malloc((E->screen_cols + 1) * sizeof(char));
-    char status_l[160], status_r[20];
+    char status_l[160], status_r[40];
+
+    // Calculate bytes
+    int bytes = 0;
+    for (int i = 0; i < E->num_rows; i++) {
+        bytes += E->row[i].size;
+    }
 
     int len_l = snprintf(status_l, sizeof(status_l),
         "%.10s %.20s - %s",
@@ -53,7 +59,13 @@ void editorDrawStatusBar(Editor *E) {
         "[No Name]",
         "(modified)"
         );
-    int len_r = snprintf(status_r, sizeof(status_r), "%s | %d:%d ", "no ft", E->cur_y + 1, E->ren_x + 1);
+    int len_r = snprintf(status_r, sizeof(status_r),
+        "%s | %db | %d:%d ",
+        "no ft",
+        bytes,
+        E->cur_y + 1,
+        E->ren_x + 1
+        );
 
     if (len_l > E->screen_cols) len_l = E->screen_cols;
     strcpy(status_f, status_l);
