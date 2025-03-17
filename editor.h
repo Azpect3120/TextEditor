@@ -90,6 +90,12 @@ typedef struct Editor {
      * @note Used to update the message on refresh.
      */
     int message_time;
+
+    /**
+     * @brief Name of the file that is open, if none exists, the user will
+     * be prompt to enter one when saving.
+     */
+    char *filename;
 } Editor;
 
 /**
@@ -110,6 +116,8 @@ void initEditor(Editor *E);
  * Draw the status bar with the content pre-defined. No message here.
  * @param E Editor state
  * @note This will be called on each render.
+ * @note This function will move the cursor, so it should be moved back after
+ * this function is called.
  */
 void editorDrawStatusBar(Editor *E);
 
@@ -117,6 +125,8 @@ void editorDrawStatusBar(Editor *E);
  * Draw the message bar with the content in the editor state.
  * @param E Editor state
  * @note This will be called on each render.
+ * @note This function will move the cursor, so it should be moved back after
+ * this function is called.
  */
 void editorDrawMessage(Editor *E);
 
@@ -127,6 +137,13 @@ void editorDrawMessage(Editor *E);
  * @param ... Optional arguments for the fmt.
  */
 void editorSetStatusMessage(Editor *E, char *fmt, ...);
+
+/**
+ * Open a file and load it's content into the editor.
+ * @param E Editor state
+ * @param filename Name of the file to open
+ */
+void editorOpenFile(Editor *E, char *filename);
 
 
 #endif //EDITOR_H

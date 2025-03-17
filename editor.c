@@ -4,6 +4,7 @@
 #include <ncurses.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 void editorRefresh(Editor *E) {
     // Update size state
@@ -56,7 +57,7 @@ void editorDrawStatusBar(Editor *E) {
     int len_l = snprintf(status_l, sizeof(status_l),
         "%.10s %.20s - %s",
         "INSERT",
-        "[No Name]",
+        E->filename ? E->filename : "[No Name]",
         "(modified)"
         );
     int len_r = snprintf(status_r, sizeof(status_r),
@@ -88,6 +89,9 @@ void editorDrawStatusBar(Editor *E) {
 }
 
 void editorDrawMessage(Editor *E) {
+    // Clear the line before printing
+    move(E->screen_rows - 1, 0);
+    clrtoeol();
     if (E->message != (NULL) && time(NULL) - E->message_time < MESSAGE_TIMEOUT)
         mvwprintw(stdscr, E->screen_rows - 1, 0, "%s", E->message);
 }
@@ -111,7 +115,54 @@ void editorSetStatusMessage(Editor *E, char *fmt, ...) {
 
 void initEditor(Editor *E) {
     E->row = NULL;
+    E->filename = NULL;
     E->num_rows = 0;
     E->screen_rows = LINES;
     E->screen_cols = COLS;
+
+    // Initialize ncurses
+    initscr();
+    start_color();
+    raw();
+    noecho();
+    keypad(stdscr, TRUE);
+
+    init_pair(1, COLOR_BLACK, COLOR_WHITE);
+    init_pair(2, COLOR_YELLOW, COLOR_BLACK);
+
+
+    // Set default colors
+    assume_default_colors(COLOR_WHITE, COLOR_BLACK);
+    use_default_colors();
 };
+
+void editorOpenFile(Editor *E, char *filename) {
+    // Set the filename in the state
+    free(E->filename);
+    E->filename = strdup(filename);
+
+    // Open the file
+    FILE *fp = fopen(filename, "r");
+    if (!fp) {
+        editorSetStatusMessage(E, "Failed to open %s", E->filename);
+        return;
+    }
+
+    // Get the lines and add them to the editor
+    char *line = NULL;
+    size_t line_cap = 0;
+    size_t line_len;
+    while ((line_len = getline(&line, &line_cap, fp)) != -1) {
+        // Remove the \n or \r from end of line
+        while (line_len > 0 &&
+              (line[line_len - 1] == '\n' ||
+               line[line_len - 1] == '\r')) line_len--;
+
+        editorInsertRowBelow(E, E->num_rows, line, line_len);
+    }
+
+
+    // Close the file and free memory
+    fclose(fp);
+    free(line);
+}

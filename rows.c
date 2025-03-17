@@ -78,7 +78,7 @@ void editorFreeRow(erow *row) {
     // if (row->render != NULL) free(row->render);
 }
 
-void editorInsertRowBelow(Editor *E, int pos, char *s, int len) {
+void editorInsertRowBelow(Editor *E, int pos, char *s, size_t len) {
     // Bounds check
     if (pos < 0 || pos > E->num_rows) return;
 
@@ -115,7 +115,7 @@ void editorInsertRowBelow(Editor *E, int pos, char *s, int len) {
 
 void editorInsertNewline(Editor *E) {
     // Calculate previous line indentation
-    int tabs = 0;
+    size_t tabs = 0;
     if (E->cur_y > 0) {
         for (int i = 0; i < E->row[E->cur_y].size; i++)
             if (E->row[E->cur_y].chars[i] == '\t') tabs++;
@@ -132,7 +132,7 @@ void editorInsertNewline(Editor *E) {
     } else {
         erow *row = &E->row[E->cur_y];
         // Create the new string with the appended tabs, +1 for null terminator
-        const int len = tabs + (row->size - E->cur_x);
+        const size_t len = tabs + (row->size - E->cur_x);
         char *newChars = (char *)malloc((len + 1) * sizeof(char));
 
         // Concat the strings together

@@ -1,7 +1,9 @@
 #include <ncurses.h>
 #include "editor.h"
-#include "rows.h"
 #include "keymaps.h"
+#include <stdlib.h>
+
+#include "rows.h"
 
 /*
  *
@@ -15,28 +17,16 @@
 /**
  * @brief Global editor state.
  */
-int main () {
+int main (int argc, char *argv[]) {
     Editor E;
     initEditor(&E);
 
-    // Initialize ncurses
-    initscr();
-    // TODO: Enable this when colors are enabled
-    start_color();
-    raw();
-    noecho();
-    keypad(stdscr, TRUE);
-
-    // TODO: Work on colors with the renderer
-    init_pair(1, COLOR_BLACK, COLOR_WHITE);
-    init_pair(2, COLOR_YELLOW, COLOR_BLACK);
-
-
-    // Set default colors
-    assume_default_colors(COLOR_WHITE, COLOR_BLACK);
-    use_default_colors();
-
-    editorInsertRowBelow(&E, 0, "", 0);
+    if (argc >= 2) {
+        editorOpenFile(&E, argv[1]);
+    } else {
+        // Append row to the first line to allow for typing
+        editorInsertRowBelow(&E, 0, "", 0);
+    }
 
     int exit = 0;
     while (!exit) {

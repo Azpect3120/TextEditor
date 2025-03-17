@@ -2,6 +2,7 @@
 #define ROWS_H
 
 #include "editor.h"
+#include <stdlib.h>
 
 /**
  * @breif Remove the line at position pos.
@@ -48,7 +49,7 @@ void editorFreeRow(erow *row);
  * @param len Size of the string to append
  * @note This function does NOT re-render, it just modifies the state.
  */
-void editorInsertRowBelow(Editor *E, int pos, char *s, int len);
+void editorInsertRowBelow(Editor *E, int pos, char *s, size_t len);
 
 /**
  * This was taken from kilo
