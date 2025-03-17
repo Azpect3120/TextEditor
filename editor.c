@@ -1,10 +1,16 @@
 #include "editor.h"
 #include "rows.h"
+
+#include <errno.h>
 #include <stdlib.h>
 #include <ncurses.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <fcntl.h>
 
 void editorRefresh(Editor *E) {
     // Update size state
@@ -165,4 +171,54 @@ void editorOpenFile(Editor *E, char *filename) {
     // Close the file and free memory
     fclose(fp);
     free(line);
+}
+
+void editorSaveFile(Editor *E) {
+    // TODO: FIX THIS
+    if (E->filename == NULL) {
+        editorSetStatusMessage(E, "Cannot save a null file silly goose! (TODO: Fix this)");
+        return;
+    }
+
+    // Convert the content to a string
+    int len;
+    char *buf = editorContentToString(E, &len);
+
+    int fd = open(E->filename, O_RDWR | O_CREAT, 0644);
+    if (fd != -1) {
+        // Truncate file to the content size, the bytes will be written over, but
+        // excess bytes will not, so we remove them here.
+        if (ftruncate(fd, len) != 1) {
+            if (write(fd, buf, len) == len) {
+                close(fd);
+                free(buf);
+                editorSetStatusMessage(E, "%d bytes written to %s", len, E->filename);
+                return;
+            }
+        }
+    }
+
+    // Catch error and free buffer
+    free(buf);
+    editorSetStatusMessage(E, "Failed to save: %s", strerror(errno));
+}
+
+char *editorContentToString(Editor *E, int *buf_len) {
+    // Compute total length and update passed value
+    int tot_len = 0;
+    for (int i = 0; i < E->num_rows; i++)
+        tot_len += E->row[i].size + 1;
+    *buf_len = tot_len;
+
+    // Generate the final string
+    char *buf = malloc(tot_len);
+    char *p = buf;
+    for (int i = 0; i < E->num_rows; i++) {
+        memcpy(p, E->row[i].chars, E->row[i].size);
+        p += E->row[i].size;
+        *p = '\n';
+        p++;
+    }
+
+    return buf;
 }

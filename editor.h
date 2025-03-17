@@ -138,12 +138,23 @@ void editorDrawMessage(Editor *E);
  */
 void editorSetStatusMessage(Editor *E, char *fmt, ...);
 
+// TODO: MOVE THESE TO A FILES.C file
+
 /**
  * Open a file and load it's content into the editor.
  * @param E Editor state
  * @param filename Name of the file to open
  */
 void editorOpenFile(Editor *E, char *filename);
+
+/**
+ * Save the content in the editor to the file that is opened.
+ * @param E Editor state
+ * TODO: Handle NULL filename, for now, it skips.
+ */
+void editorSaveFile(Editor *E);
+
+char *editorContentToString(Editor *E, int *buf_len);
 
 
 #endif //EDITOR_H

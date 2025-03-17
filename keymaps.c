@@ -28,10 +28,16 @@ int editorProcessKeyPress(Editor *E, const int c) {
         editorInsertNewline(E);
     // Keys between 1 and 26 SHOULD be control-characters
     } else if (iscntrl(c) && c >= 1 && c <= 26) {
-        // Ctrl-C or Ctrl-Q
+        // Ctrl-C or Ctrl-Q: Quit
         if (c == 3 ||c == 17) return 1;
 
-        // Catch Ctrl-I: tab for some reason...
+        // Ctrl-S: Save
+        if (c == 19) {
+            editorSaveFile(E);
+            return 0;
+        }
+
+        // Catch Ctrl-I as tab for some reason...
         if (c == 9) {
             editorInsertCharacter(E, E->cur_x, E->cur_y, (char) c);
             return 0;
