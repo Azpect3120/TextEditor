@@ -16,6 +16,12 @@ void editorRemoveRow(Editor *E, const int pos) {
     // Move the memory on top of the old row
     memmove(&E->row[pos], &E->row[pos + 1], sizeof(erow) * (E->num_rows - pos - 1));
 
+    // Generate new renders
+    // TODO: If any render issues come along with deleting, check here
+    for (int i = pos; i < E->num_rows; i++) {
+        editorRenderRow(&E->row[i]);
+    }
+
     // Decrease the row count
     E->num_rows--;
 }
@@ -99,6 +105,7 @@ void editorInsertRowBelow(Editor *E, int pos, char *s, size_t len) {
         memcpy(E->row[i].chars, oldChars, oldSize);
         E->row[i].chars[oldSize] = '\0';
         E->row[i].size = oldSize;
+        editorRenderRow(&E->row[i]);
 
         free(oldChars);
     }
@@ -112,6 +119,7 @@ void editorInsertRowBelow(Editor *E, int pos, char *s, size_t len) {
     E->row[pos].chars[len] = '\0';
 
     // TODO: Create an updated render of the row
+    editorRenderRow(&E->row[pos]);
 
     // Increment the number of rows
     E->num_rows++;
@@ -133,6 +141,7 @@ void editorInsertNewline(Editor *E) {
 
     if (E->cur_x == 0) {
         editorInsertRowBelow(E, E->cur_y, indent, tabs);
+        editorRenderRow(&E->row[E->cur_y]);
     } else {
         erow *row = &E->row[E->cur_y];
         // Create the new string with the appended tabs, +1 for null terminator
@@ -145,8 +154,10 @@ void editorInsertNewline(Editor *E) {
         newChars[len] = '\0';
 
         editorInsertRowBelow(E, E->cur_y + 1, newChars, len);
+        editorRenderRow(&E->row[E->cur_y + 1]);
         row = &E->row[E->cur_y];
         row->size = E->cur_x;
+        editorRenderRow(row);
     }
 
     E->cur_y++;
