@@ -20,53 +20,54 @@ void editorRefresh(Editor *E) {
     // Clear the screen before new render
     wclear(stdscr);
 
-    // Update the scroll and cursor position
+    // Update scroll values
     editorScroll(E);
 
-    // Loop the rows, and render each row
-    int y;
-    for (y = E->rowoff; y < E->screen_rows - 2 + E->rowoff; y++) {
-        editorDrawRow(&E->row[y], y);
-        editorDrawRowNum(E->cur_y, y);
+    // Calculate the height of the screen, based on the rows
+    int view_height = E->screen_rows - 2;
 
+    for (int y = 0; y < view_height; y++) {
+        int row_index = E->view_start + y;
+        if (row_index >= 0 && row_index < E->num_rows) {
+            editorDrawRowNum(E->cur_y - E->view_start,
+                row_index - E->view_start,
+                E->view_start);
+            editorDrawRow(&E->row[row_index], y);
+        } else {
+            mvwprintw(stdscr, y, 0, "~");
+        }
     }
-
-    // Loop over unused rows except last one
-    for (y = E->num_rows; y < E->screen_rows - 2; y++) {
-        mvwprintw(stdscr, y, 0, "~");
-    }
-
-    // Check if the y is out of bounds
-    if (E->cur_y >= E->num_rows) E->cur_y == E->num_rows - 1;
 
     // Draw status bar and message bar
     editorDrawStatusBar(E);
     editorDrawMessage(E);
 
-    if (E->cur_y >= E->screen_rows - 2) E->cur_y = E->screen_rows - 3;
-
     // Move the cursor to the proper position defined in the state
-    wmove(stdscr, E->cur_y, E->ren_x);
+    wmove(stdscr, E->cur_y - E->view_start, E->ren_x);
 }
 
-void editorScroll (Editor *E) {
+void editorScroll(Editor *E) {
     // Calculate render cursor position
     E->ren_x = 0;
-    if (E->cur_y < E->num_rows)
-        E->ren_x = editorRowGetRenderX(&E->row[E->cur_y], E->cur_x);
+    if (E->cur_y < E->num_rows) E->ren_x = editorRowGetRenderX(&E->row[E->cur_y], E->cur_x);
 
-    // if (E->cur_y < E->rowoff) E->rowoff = E->cur_y;
+    // Subtract status and message bars
+    int view_height = E->screen_rows - 2;
 
-    // if (E->cur_y + SCROLL_OFF >= E->rowoff + E->screen_rows) {
-    //     E->rowoff = E->cur_y - E->screen_rows;
-    // }
+    // Ensure the cursor is within view with offset
+    if (E->cur_y < E->view_start + SCROLL_OFF) {
+        E->view_start = E->cur_y - SCROLL_OFF;
+        if (E->view_start < 0) E->view_start = 0;
+    } else if (E->cur_y >= E->view_start + view_height - SCROLL_OFF) {
+        E->view_start = E->cur_y - view_height + 1 + SCROLL_OFF;
+    }
 
-    if (E->cur_y >= (E->screen_rows - 2 - SCROLL_OFF))
-        E->rowoff = E->cur_y - (E->screen_rows - 2) + SCROLL_OFF;
-
-    // TODO: Column scrolling
-
-    editorSetStatusMessage(E, "ren_x %d cur_y %d rowoff %d screen_rows %d", E->ren_x, E->cur_y, E->rowoff, E->screen_rows);
+    // Boundary check
+    if (E->view_start < 0) E->view_start = 0;
+    if (E->view_start + view_height > E->num_rows) {
+        E->view_start = E->num_rows - view_height;
+        if (E->view_start < 0) E->view_start = 0;
+    }
 }
 
 void editorDrawStatusBar(Editor *E) {
@@ -139,21 +140,22 @@ void editorSetStatusMessage(Editor *E, char *fmt, ...) {
 }
 
 void initEditor(Editor *E) {
-    E->row = NULL;
-    E->filename = NULL;
-    E->num_rows = 0;
-    E->rowoff = 0;
-    E->cur_x = 0;
-    E->cur_y = 0;
-    E->screen_rows = LINES;
-    E->screen_cols = COLS;
-
     // Initialize ncurses
     initscr();
     start_color();
     raw();
     noecho();
     keypad(stdscr, TRUE);
+
+    E->row = NULL;
+    E->filename = NULL;
+    E->num_rows = 0;
+    E->cur_x = 0;
+    E->cur_y = 0;
+    E->view_start = 0;
+    E->screen_rows = LINES;
+    E->screen_cols = COLS;
+
 
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
     init_pair(2, COLOR_YELLOW, COLOR_BLACK);

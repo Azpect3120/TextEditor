@@ -10,7 +10,8 @@ int editorProcessKeyPress(Editor *E, const int c) {
     if (c == KEY_BACKSPACE) {
         editorRemoveCharacter(E, E->cur_x, E->cur_y);
     } else if (c == KEY_DOWN) {
-        if (E->cur_y < E->num_rows) {
+        // TODO: This might be wrong to add the -1, it prevents going down a line into the status bar.
+        if (E->cur_y < E->num_rows - 1) {
             E->cur_y++;
             if (E->row != NULL && E->cur_x >= E->row[E->cur_y].size)
                 E->cur_x = E->row[E->cur_y].size;

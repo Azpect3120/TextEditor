@@ -54,17 +54,19 @@ void editorDrawRow(erow *row, int pos) {
     mvwprintw(stdscr, pos, NUM_COL_SIZE, "%s", row->render);
 }
 
-void editorDrawRowNum(int cur_y, int pos) {
+void editorDrawRowNum(int cur_y, int pos, int offset) {
     int line_num = 0;
     char fmt[10];
 
     if (RELATIVE_NUM) {
         if (cur_y == pos) line_num = pos + 1;
-        else if (cur_y > pos) line_num = cur_y - pos;
-        else line_num = pos - cur_y;
+        else if (cur_y > pos) line_num = cur_y - pos - offset;
+        else line_num = pos - cur_y - offset;
     } else {
         line_num = pos + 1;
     }
+    line_num += offset;
+
 
     if (cur_y == pos) snprintf(fmt, sizeof(fmt), "%%%dd  ", NUM_COL_SIZE - 2);
     else snprintf(fmt, sizeof(fmt), "%%%dd ", NUM_COL_SIZE - 1);

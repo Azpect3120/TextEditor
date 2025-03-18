@@ -82,10 +82,10 @@ typedef struct Editor {
     int ren_x;
 
     /**
-     * @brief Current y position where the user is scrolled too
-     * @note 0-indexed, where 0 is the top.
+     * @brief The start of the view being rendered.
+     * @note Gemini finally spat this solution out.
      */
-    int rowoff;
+    int view_start;
 
     /**
      * @breif Message to display in the message bar.
@@ -118,6 +118,7 @@ void editorRefresh(Editor *E);
  * @param E Editor state
  * @note Scroll-off constant is used to determine the scroll.
  * @note This function DOES NOT move the cursor, just updates the state.
+ * @note Gemini wrote this, so if changes need to be made, good luck.
  */
 void editorScroll(Editor *E);
 
