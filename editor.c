@@ -198,10 +198,13 @@ void editorOpenFile(Editor *E, char *filename) {
 }
 
 void editorSaveFile(Editor *E) {
-    // TODO: FIX THIS
     if (E->filename == NULL) {
-        editorSetStatusMessage(E, "Cannot save a null file silly goose! (TODO: Fix this)");
-        return;
+        char *filename = editorPrompt(E, "Enter a filename: %s", NULL);
+        if (filename == NULL) {
+            editorSetStatusMessage(E, "Cannot save a null file silly goose! (TODO: Fix this)");
+            return;
+        }
+        E->filename = filename;
     }
 
     // Convert the content to a string
@@ -245,4 +248,39 @@ char *editorContentToString(Editor *E, int *buf_len) {
     }
 
     return buf;
+}
+
+char *editorPrompt(Editor *E, char *prompt, void (*callback)(char *, int)) {
+    // TODO: Callback is ignored, implement it for searching
+    // Create input buffer
+    size_t buf_size = 128;
+    char *buf = malloc(buf_size);
+
+    size_t buf_len = 0;
+    buf[0] = '\0';
+
+    while (true) {
+        editorSetStatusMessage(E, prompt, buf);
+        editorRefresh(E);
+
+        int c = wgetch(stdscr);
+        if (c == KEY_BACKSPACE) {
+            if (buf_len > 0) buf[--buf_len] = '\0';
+        } else if (c == '\n' || c == KEY_ENTER || c == '\r') {
+            editorSetStatusMessage(E, "");
+            return buf;
+        // Catch ESC: There doesn't seem to be an escape key
+        } else if (c == 27 || c == '\x1b') {
+            editorSetStatusMessage(E, "");
+            return NULL;
+        } else if (!iscntrl(c) && c > 26) {
+            if (buf_len == buf_size - 1) {
+                buf_size *= 2;
+                buf = realloc(buf, buf_size);
+            }
+
+            buf[buf_len++] = (char) c;
+            buf[buf_len] = '\0';
+        }
+    }
 }

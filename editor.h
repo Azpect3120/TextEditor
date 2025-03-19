@@ -170,7 +170,26 @@ void editorOpenFile(Editor *E, char *filename);
  */
 void editorSaveFile(Editor *E);
 
+/**
+ * Convert the content in the rows into a string. The size will be
+ * updated and set in the buf_len parameter.
+ * @param E Editor state
+ * @param buf_len Length of the content (will be updated)
+ * @return Content as a \\n split string
+ */
 char *editorContentToString(Editor *E, int *buf_len);
 
+/**
+ * Prompt the user to fill out a prompt.
+ * This will take over control of the keymaps and send them all into this function.
+ * If ESC is pressed at any point during the prompt, nothing will be returned.
+ * @param E Editor state
+ * @param prompt Prompt string
+ * @param callback Callback to call when submitted
+ * @return The content that was provided by the user
+ * @note TODO: Callback is not handled, just a parameter for now
+ * @note A string format specifier is expected to be in the prompt string.
+ */
+char *editorPrompt(Editor *E, char *prompt, void (*callback)(char *,int));
 
 #endif //EDITOR_H

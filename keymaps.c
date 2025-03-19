@@ -4,7 +4,7 @@
 #include <ctype.h>
 
 int editorProcessKeyPress(Editor *E, const int c) {
-    // editorSetStatusMessage(E, "Key pressed: '%c' (%d)", (c == '\n') ? ' ' : c, c);
+    editorSetStatusMessage(E, "Key pressed: '%c' (%d)", (c == '\n') ? ' ' : c, c);
 
     // Ctrl-H is caught here
     if (c == KEY_BACKSPACE) {
