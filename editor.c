@@ -201,7 +201,7 @@ void editorSaveFile(Editor *E) {
     if (E->filename == NULL) {
         char *filename = editorPrompt(E, "Enter a filename: %s", NULL);
         if (filename == NULL) {
-            editorSetStatusMessage(E, "Cannot save a null file silly goose! (TODO: Fix this)");
+            editorSetStatusMessage(E, "Failed to save. Invalid file name.");
             return;
         }
         E->filename = filename;
@@ -259,6 +259,10 @@ char *editorPrompt(Editor *E, char *prompt, void (*callback)(char *, int)) {
     size_t buf_len = 0;
     buf[0] = '\0';
 
+    // Hold delay value, and set it to 0 for this function
+    int delay = ESCDELAY;
+    ESCDELAY = 0;
+
     while (true) {
         editorSetStatusMessage(E, prompt, buf);
         editorRefresh(E);
@@ -268,10 +272,12 @@ char *editorPrompt(Editor *E, char *prompt, void (*callback)(char *, int)) {
             if (buf_len > 0) buf[--buf_len] = '\0';
         } else if (c == '\n' || c == KEY_ENTER || c == '\r') {
             editorSetStatusMessage(E, "");
+            ESCDELAY = delay;
             return buf;
         // Catch ESC: There doesn't seem to be an escape key
         } else if (c == 27 || c == '\x1b') {
             editorSetStatusMessage(E, "");
+            ESCDELAY = delay;
             return NULL;
         } else if (!iscntrl(c) && c > 26) {
             if (buf_len == buf_size - 1) {
