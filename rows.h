@@ -55,6 +55,7 @@ void editorInsertRowBelow(Editor *E, int pos, char *s, size_t len);
 /**
  * This was taken from kilo
  * TODO: Figure out what tf this does.
+ * @note This function will increment the dirty counter.
  */
 void editorInsertNewline(Editor *E);
 
@@ -74,7 +75,8 @@ void rowAppendStr(Editor *E, erow *row, const char *s, const int len);
  * @param x X position, location in the row
  * @param y Y position, row to insert into
  * @param c Character to insert
- * @note This function DOES move the cursor, in the +x direction
+ * @note This function DOES move the cursor, in the +x direction.
+ * @note This function will increment the dirty counter.
  */
 void editorInsertCharacter(Editor *E, const int x, const int y, const char c);
 
@@ -83,6 +85,7 @@ void editorInsertCharacter(Editor *E, const int x, const int y, const char c);
  * @param E Editor state
  * @param x X position, location in the row
  * @param y Y position, row to insert into
+ * @note This function will increment the dirty counter.
  */
 void editorRemoveCharacter(Editor *E, const int x, const int y);
 

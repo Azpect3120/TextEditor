@@ -103,6 +103,13 @@ typedef struct Editor {
      * be prompt to enter one when saving.
      */
     char *filename;
+
+    /**
+     * @breif Stores a value of how "dirty" the file is. The number of changes
+     * made to the file.
+     * @note Any value over 0 indicates a file has been changed.
+     */
+    int dirty;
 } Editor;
 
 /**
@@ -166,7 +173,8 @@ void editorOpenFile(Editor *E, char *filename);
 /**
  * @brief Save the content in the editor to the file that is opened.
  * @param E Editor state
- * TODO: Handle NULL filename, for now, it skips.
+ * @note This function will set the dirty value to 0, indicating all changes
+ * are saved.
  */
 void editorSaveFile(Editor *E);
 

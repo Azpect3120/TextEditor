@@ -160,6 +160,7 @@ void editorInsertNewline(Editor *E) {
         editorRenderRow(row);
     }
 
+    E->dirty++;
     E->cur_y++;
     E->cur_x = tabs;
     free(indent);
@@ -211,8 +212,9 @@ void editorInsertCharacter(Editor *E, const int x, const int y, const char c) {
     // TODO: Abstract this into an update row function
     row->chars[row->size] = '\0';
 
-    // Move the cursor one to the right
+    // Move the cursor one to the right and update dirty status
     E->cur_x++;
+    E->dirty++;
 
     // Update the render in the row
     editorRenderRow(row);
@@ -249,8 +251,9 @@ void editorRemoveCharacter(Editor *E, const int x, const int y) {
     // TODO: Abstract this into an update row function
     row->chars[row->size] = '\0';
 
-    // Move then cursor one to the left
+    // Move then cursor one to the left and update dirty status
     E->cur_x--;
+    E->dirty++;
 
     // Update the render in the row
     editorRenderRow(row);

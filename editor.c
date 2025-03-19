@@ -81,10 +81,10 @@ void editorDrawStatusBar(Editor *E) {
     }
 
     int len_l = snprintf(status_l, sizeof(status_l),
-        "%.10s %.20s - %s",
+        "%.10s %.20s %s",
         "INSERT",
         E->filename ? E->filename : "[No Name]",
-        "(modified)"
+        E->dirty != 0 ? "- (modified)" : ""
         );
     int len_r = snprintf(status_r, sizeof(status_r),
         "%s | %db | %d:%d ",
@@ -149,6 +149,7 @@ void initEditor(Editor *E) {
 
     E->row = NULL;
     E->filename = NULL;
+    E->dirty = 0;
     E->num_rows = 0;
     E->cur_x = 0;
     E->cur_y = 0;
@@ -220,6 +221,7 @@ void editorSaveFile(Editor *E) {
                 close(fd);
                 free(buf);
                 editorSetStatusMessage(E, "%d bytes written to %s", len, E->filename);
+                E->dirty = 0;
                 return;
             }
         }
