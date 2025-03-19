@@ -105,6 +105,12 @@ typedef struct Editor {
     char *filename;
 
     /**
+     * @brief Type of the file in the editor.
+     * @note Stored as the file extension excluding the period.
+     */
+    char *filetype;
+
+    /**
      * @breif Stores a value of how "dirty" the file is. The number of changes
      * made to the file.
      * @note Any value over 0 indicates a file has been changed.
@@ -177,6 +183,12 @@ void editorOpenFile(Editor *E, char *filename);
  * are saved.
  */
 void editorSaveFile(Editor *E);
+
+/**
+ * Detect the filetype of the filename stored in the state.
+ * @param E Editor state
+ */
+void editorDetectFileType(Editor *E);
 
 /**
  * Convert the content in the rows into a string. The size will be

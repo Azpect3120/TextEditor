@@ -88,7 +88,7 @@ void editorDrawStatusBar(Editor *E) {
         );
     int len_r = snprintf(status_r, sizeof(status_r),
         "%s | %db | %d:%d ",
-        "no ft",
+        E->filetype ? E->filetype : "no ft",
         bytes,
         E->cur_y + 1,
         E->ren_x + 1
@@ -172,6 +172,9 @@ void editorOpenFile(Editor *E, char *filename) {
     free(E->filename);
     E->filename = strdup(filename);
 
+    // Detect and update the filetype
+    editorDetectFileType(E);
+
     // Open the file
     FILE *fp = fopen(filename, "r");
     if (!fp) {
@@ -208,6 +211,9 @@ void editorSaveFile(Editor *E) {
         E->filename = filename;
     }
 
+    // Detect and update the filetype
+    editorDetectFileType(E);
+
     // Convert the content to a string
     int len;
     char *buf = editorContentToString(E, &len);
@@ -230,6 +236,15 @@ void editorSaveFile(Editor *E) {
     // Catch error and free buffer
     free(buf);
     editorSetStatusMessage(E, "Failed to save: %s", strerror(errno));
+}
+
+void editorDetectFileType(Editor *E) {
+    if (E->filename == NULL) return;
+    char *dot = strrchr(E->filename, '.');
+
+    // Unknown filetype: missing .ext
+    if (dot == NULL) return;
+    E->filetype = ++dot;
 }
 
 char *editorContentToString(Editor *E, int *buf_len) {
