@@ -1,7 +1,6 @@
 #include <ncurses.h>
 #include "editor.h"
 #include "keymaps.h"
-#include <stdlib.h>
 
 #include "rows.h"
 
@@ -14,9 +13,6 @@
  * WMOVE(screen, x, y) MOVES the cursor
  */
 
-/**
- * @brief Global editor state.
- */
 int main (int argc, char *argv[]) {
     Editor E;
     initEditor(&E);

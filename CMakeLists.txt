@@ -6,14 +6,12 @@ set(CMAKE_C_STANDARD 99)
 find_package(Curses REQUIRED)
 
 if (CURSES_FOUND)
-    include_directories(${CURSES_INCLUDE_DIRS})
-    add_executable(TextEditor main.c
-            rows.c
-            rows.h
-            editor.c
-            editor.h
-            keymaps.c
-            keymaps.h
+    include_directories(${CURSES_INCLUDE_DIRS} include)
+    add_executable(TextEditor
+            src/main.c
+            src/rows.c
+            src/editor.c
+            src/keymaps.c
     )
     target_link_libraries(TextEditor ${CURSES_LIBRARIES})
 else()
