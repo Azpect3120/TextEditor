@@ -86,6 +86,7 @@ void editorInsertCharacter(Editor *E, const int x, const int y, const char c);
  * @param x X position, location in the row
  * @param y Y position, row to insert into
  * @note This function will increment the dirty counter.
+ * @note This function DOES move the cursor.
  */
 void editorRemoveCharacter(Editor *E, const int x, const int y);
 

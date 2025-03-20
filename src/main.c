@@ -24,11 +24,16 @@ int main (int argc, char *argv[]) {
         editorInsertRowBelow(&E, 0, "", 0);
     }
 
+    int delay = ESCDELAY;
+    ESCDELAY = 0;
+
     int exit = 0;
     while (!exit) {
         editorRefresh(&E);
         exit = editorProcessKeyPress(&E, wgetch(stdscr));
     }
+
+    ESCDELAY = delay;
 
 
     // TODO: Clear editor memory

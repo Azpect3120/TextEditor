@@ -47,6 +47,9 @@ void editorRefresh(Editor *E) {
 }
 
 void editorScroll(Editor *E) {
+    // Prevent the cursor from being on the last blank character in NORMAL MODE
+    if (E->mode == NORMAL_MODE && E->cur_x == E->row[E->cur_y].size && E->cur_x > 0) E->cur_x--;
+
     // Calculate render cursor position
     E->ren_x = 0;
     if (E->cur_y < E->num_rows) E->ren_x = editorRowGetRenderX(&E->row[E->cur_y], E->cur_x);
@@ -80,9 +83,22 @@ void editorDrawStatusBar(Editor *E) {
         bytes += E->row[i].size;
     }
 
+    char *mode;
+    switch (E->mode) {
+        case NORMAL_MODE:
+            mode = "NORMAL";
+            break;
+        case INSERT_MODE:
+            mode = "INSERT";
+            break;
+        case COMMAND_MODE:
+            mode = "COMMAND";
+            break;
+    }
+
     int len_l = snprintf(status_l, sizeof(status_l),
-        "%.10s %.20s %s",
-        "INSERT",
+        " %.10s %.20s %s",
+        mode,
         E->filename ? E->filename : "[No Name]",
         E->dirty != 0 ? "- (modified)" : ""
         );
@@ -156,6 +172,7 @@ void initEditor(Editor *E) {
     E->view_start = 0;
     E->screen_rows = LINES;
     E->screen_cols = COLS;
+    E->mode = NORMAL_MODE;
 
 
     init_pair(1, COLOR_BLACK, COLOR_WHITE);

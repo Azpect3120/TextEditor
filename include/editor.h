@@ -7,6 +7,12 @@
 #define RELATIVE_NUM true
 #define SCROLL_OFF 8
 
+typedef enum {
+    NORMAL_MODE,
+    INSERT_MODE,
+    COMMAND_MODE
+} EditorMode;
+
 /**
  * Editor row struct
  */
@@ -116,6 +122,12 @@ typedef struct Editor {
      * @note Any value over 0 indicates a file has been changed.
      */
     int dirty;
+
+    /**
+     * @brief Mode the editor is in.
+     * @note Mode will determine the way in which commands are parsed.
+     */
+    EditorMode mode;
 } Editor;
 
 /**
