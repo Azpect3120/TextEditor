@@ -178,7 +178,9 @@ void editorOpenFile(Editor *E, char *filename) {
     // Open the file
     FILE *fp = fopen(filename, "r");
     if (!fp) {
-        editorSetStatusMessage(E, "Failed to open %s", E->filename);
+        // Append row to the first line to allow for typing, same as in main
+        editorInsertRowBelow(E, 0, "", 0);
+        editorSetStatusMessage(E, "%s does not exist, it will be created on save.", E->filename);
         return;
     }
 
