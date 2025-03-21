@@ -94,10 +94,10 @@ void action_insert_mode_append_end(Editor *E) {
 };
 
 void action_insert_mode_below(Editor *E) {
-    // TODO: Why do I need +1?
-    editor_insert_row_below(E, E->cur_y + 1, "", 0);
-    E->cur_y++;
-    E->cur_x = 0;
+    size_t len;
+    char *indent = editor_calculate_indent(E, &len, E->cur_y);
+    editor_insert_row_below(E, E->cur_y + 1, indent, len);
+    action_move_cursor(E, DIRECTION_DOWN);
     E->mode = INSERT_MODE;
 }
 

@@ -163,18 +163,8 @@ void editor_insert_row_below(Editor *E, int pos, char *s, size_t len) {
 }
 
 void editor_insert_newline(Editor *E) {
-    // Calculate previous line indentation
-    size_t tabs = 0;
-    if (E->cur_y > 0) {
-        for (int i = 0; i < E->row[E->cur_y].size; i++)
-            if (E->row[E->cur_y].chars[i] == '\t') tabs++;
-            else break;
-    }
-
-    // Create newline string, +1 for null terminator
-    char *indent = (char *)malloc((tabs + 1) * sizeof(char));
-    for (int i = 0; i < tabs; i++) indent[i] = '\t';
-    indent[tabs] = '\0';
+    size_t tabs;
+    char *indent = editor_calculate_indent(E, &tabs, E->cur_y);
 
     if (E->cur_x == 0) {
         editor_insert_row_below(E, E->cur_y, indent, tabs);
@@ -305,3 +295,20 @@ int editor_row_get_render_x(erow *row, int cur_x) {
     return rx + NUM_COL_SIZE;
 }
 
+char *editor_calculate_indent(Editor *E, size_t *len, int row) {
+   size_t tabs = 0;
+    if (row > 0) {
+        for (int i = 0; i < E->row[row].size; i++)
+            if (E->row[row].chars[i] == '\t') tabs++;
+            else break;
+    }
+
+    // Create newline string, +1 for null terminator
+    char *indent = (char *)malloc((tabs + 1) * sizeof(char));
+    if (indent == NULL) exit(1);
+    for (int i = 0; i < tabs; i++) indent[i] = '\t';
+    indent[tabs] = '\0';
+
+    *len = tabs;
+    return indent;
+}

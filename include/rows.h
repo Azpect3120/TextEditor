@@ -101,12 +101,20 @@ void editor_insert_character(Editor *E, const int x, const int y, const char c);
 void editor_remove_character(Editor *E, const int x, const int y);
 
 /**
- * Compute the position of the cursor in the render based on the current position.
+ * @brief Compute the position of the cursor in the render based on the current position.
  * @param row Row to generate render position for.
  * @param cur_x Current position of the cursor in the x direction.
  * @return ren_x position
  */
 int editor_row_get_render_x(erow *row, int cur_x);
 
+/**
+ * @brief Compute the indentation and return the tabbed value.
+ * @param E Editor state
+ * @param len Length of the string returned. WILL BE MODIFIED!
+ * @param row Y value to calculate at
+ * @note Col will usually be E->cur_y, but I want this to be modular.
+ */
+char *editor_calculate_indent(Editor *E, size_t *len, int row);
 
 #endif //ROWS_H
