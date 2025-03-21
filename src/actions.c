@@ -1,6 +1,8 @@
 #include "actions.h"
 #include "rows.h"
 #include <stddef.h>
+#include <stdbool.h>
+
 
 // ---- UTIL ----
 
@@ -136,6 +138,50 @@ void action_quit(Editor *E) {
 void action_save(Editor *E) {
     editor_save_file(E);
 };
+
+void action_move_next_word_start(Editor *E) {
+    erow *row = &E->row[E->cur_y];
+
+    int i;
+    bool space_found = false;
+    for (i = E->cur_x; i < row->size; i++) {
+        if (row->chars[i] == ' ') space_found = true;
+        if (space_found && row->chars[i] != ' ') break;
+    }
+
+    // TODO: Move to next lines when at the end
+    // If we didn't find another word, move to the next line
+    // if (!char_found && !space_found && E->cur_y < E->num_rows) {
+    //     erow *next_row = &E->row[E->cur_y + 1];
+    //     for (i = 0; i < next_row->size; i++) {
+    //         if (row->chars[i] == ' ') space_found = true;
+    //         if (space_found && row->chars[i] != ' ') break;
+    //     }
+    //     E->cur_y++;
+    // }
+
+    E->cur_x = i;
+}
+
+void action_move_prev_word_start(Editor *E) {
+    erow *row = &E->row[E->cur_y];
+
+    int i;
+    bool space_found = false;
+    bool chars_found = false;
+    for (i = E->cur_x; i > 0; i--) {
+        if (row->chars[i] == ' ') space_found = true;
+        if (space_found && row->chars[i] != ' ') chars_found = true;
+        if (chars_found && space_found && row->chars[i] == ' ') break;
+    }
+
+    E->cur_x = ++i;
+
+}
+
+void action_move_curr_word_end(Editor *E) {
+
+}
 
 // ---- INSERT MORE ----
 
