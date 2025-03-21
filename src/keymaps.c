@@ -1,5 +1,6 @@
 #include "keymaps.h"
 #include "rows.h"
+#include "actions.h"
 #include <ncurses.h>
 #include <ctype.h>
 #include <string.h>
@@ -64,9 +65,21 @@ int parse_command_normal(Editor *E, int command) {
 
     if (command == 'i') {
         editorSwitchMode(E, INSERT_MODE);
-    } else if (command == 'a') {
-        moveCursor(E, DIRECTION_RIGHT);
+    } else if (command == 'I') {
         editorSwitchMode(E, INSERT_MODE);
+        action_move_to_first_character(E);
+    } else if (command == 'a') {
+        editorSwitchMode(E, INSERT_MODE);
+        moveCursor(E, DIRECTION_RIGHT);
+    } else if (command == 'A') {
+        editorSwitchMode(E, INSERT_MODE);
+        action_move_to_end_of_line(E);
+    } else if (command == '0') {
+        action_move_to_start_of_line(E);
+    } else if (command == '$') {
+        action_move_to_end_of_line(E);
+    } else if (command == '_') {
+        action_move_to_first_character(E);
     } else if (command == 'h') {
         moveCursor(E, DIRECTION_LEFT);
     } else if (command == 'j') {
@@ -120,7 +133,9 @@ int parse_command_insert(Editor *E, int command) {
 
     return 0;
 }
-int parse_command_command(Editor *E, int command) { return 0; }
+int parse_command_command(Editor *E, int command) {
+    return 0;
+}
 
 void editorSwitchMode(Editor *E, EditorMode new_mode) {
     E->mode = new_mode;
