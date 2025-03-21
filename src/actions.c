@@ -180,7 +180,18 @@ void action_move_prev_word_start(Editor *E) {
 }
 
 void action_move_curr_word_end(Editor *E) {
+    erow *row = &E->row[E->cur_y];
 
+    int i = E->cur_x + 1;
+
+    // Move until the chars aren't spaces
+    while (row->chars[i] == ' ') i++;
+
+    for (i; i < row->size; i++) {
+        if (row->chars[i] == ' ') break;
+    }
+
+    E->cur_x = --i;
 }
 
 // ---- INSERT MORE ----
