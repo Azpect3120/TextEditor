@@ -227,15 +227,15 @@ void action_delete_last_word(Editor *E) {
 
     int i = E->cur_x;
     // Skip trailing white space
-    // while (i > 0 && is_whitespace(row->chars[i])) i--;
-    while (i > 0 && isspace(row->chars[i])) i--;
+    while (i >= 0 && (isspace(row->chars[i]) || row->chars[i] == '\0')) i--;
 
     // Find the beginning of the word
-    while (i > 0 && !isspace(row->chars[i])) i--;
+    while (i >= 0 && !isspace(row->chars[i])) i--;
 
     // TODO: Maybe there is a better way? But maybe not!
     int count = E->cur_x - i;
-    while (count-- > 0) {
+    while (count-- > 1) {
+        action_move_cursor(E, DIRECTION_LEFT);
         action_delete_char(E);
     }
 }
