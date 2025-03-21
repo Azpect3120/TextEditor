@@ -39,6 +39,7 @@ KeyMap normal_mode_keymaps[] = {
 KeyMap insert_mode_keymaps[] = {
     {'\x1b', action_normal_mode},  // ESC
     {27, action_normal_mode},      // ESC
+    {3, action_normal_mode},       // Ctrl-C
     {KEY_BACKSPACE, action_backspace},
     {8, action_backspace},      // BACKSPACE
     {KEY_ENTER, action_enter},  // Enter
