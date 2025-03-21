@@ -32,7 +32,6 @@ int execute_command_insert(Editor *E, int command);
 #endif //KEYMAPS_H
 
 /**
- * CREATE AN ACTIONS FILE WITH ACTIONS LIKE 'x' and 'd' and END OF LINE and abstract everything there.
  * Add a value to the editor state called STACK to store previous key pressed
  * Add a value to the editor state called REPEAT to store the repeat value, and just loop it.
  * Use repeat to execute the commands many times.

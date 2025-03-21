@@ -136,7 +136,7 @@ typedef struct Editor {
  * @note This function draws '~' for unused lines.
  * @note This function also updates the editor size state.
  */
-void editorRefresh(Editor *E);
+void editor_refresh(Editor *E);
 
 /**
  * @brief Handles the editors scroll functionality. As well as x-position.
@@ -145,13 +145,13 @@ void editorRefresh(Editor *E);
  * @note This function DOES NOT move the cursor, just updates the state.
  * @note Gemini wrote this, so if changes need to be made, good luck.
  */
-void editorScroll(Editor *E);
+void editor_scroll(Editor *E);
 
 /**
  * @brief Initialize the editor state object.
  * @param E Editor state
  */
-void initEditor(Editor *E);
+void init_editor(Editor *E);
 
 void editor_destroy(Editor *E);
 
@@ -162,7 +162,7 @@ void editor_destroy(Editor *E);
  * @note This function will move the cursor, so it should be moved back after
  * this function is called.
  */
-void editorDrawStatusBar(Editor *E);
+void editor_draw_status_bar(Editor *E);
 
 /**
  * @brief Draw the message bar with the content in the editor state.
@@ -171,7 +171,7 @@ void editorDrawStatusBar(Editor *E);
  * @note This function will move the cursor, so it should be moved back after
  * this function is called.
  */
-void editorDrawMessage(Editor *E);
+void editor_draw_message(Editor *E);
 
 /**
  * @brief Update the message in the status bar.
@@ -179,7 +179,7 @@ void editorDrawMessage(Editor *E);
  * @param fmt Format specifier.
  * @param ... Optional arguments for the fmt.
  */
-void editorSetStatusMessage(Editor *E, char *fmt, ...);
+void editor_set_status_message(Editor *E, char *fmt, ...);
 
 // TODO: MOVE THESE TO A FILES.C file
 
@@ -188,7 +188,7 @@ void editorSetStatusMessage(Editor *E, char *fmt, ...);
  * @param E Editor state
  * @param filename Name of the file to open
  */
-void editorOpenFile(Editor *E, char *filename);
+void editor_open_file(Editor *E, char *filename);
 
 /**
  * @brief Save the content in the editor to the file that is opened.
@@ -196,13 +196,13 @@ void editorOpenFile(Editor *E, char *filename);
  * @note This function will set the dirty value to 0, indicating all changes
  * are saved.
  */
-void editorSaveFile(Editor *E);
+void editor_save_file(Editor *E);
 
 /**
  * Detect the filetype of the filename stored in the state.
  * @param E Editor state
  */
-void editorDetectFileType(Editor *E);
+void editor_detect_file_type(Editor *E);
 
 /**
  * Convert the content in the rows into a string. The size will be
@@ -211,7 +211,7 @@ void editorDetectFileType(Editor *E);
  * @param buf_len Length of the content (will be updated)
  * @return Content as a \\n split string
  */
-char *editorContentToString(Editor *E, int *buf_len);
+char *editor_content_to_string(Editor *E, int *buf_len);
 
 /**
  * Prompt the user to fill out a prompt.
@@ -224,6 +224,6 @@ char *editorContentToString(Editor *E, int *buf_len);
  * @note TODO: Callback is not handled, just a parameter for now
  * @note A string format specifier is expected to be in the prompt string.
  */
-char *editorPrompt(Editor *E, char *prompt, void (*callback)(char *,int));
+char *editor_prompt(Editor *E, char *prompt, void (*callback)(char *,int));
 
 #endif //EDITOR_H

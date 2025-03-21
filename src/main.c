@@ -15,17 +15,17 @@
 
 int main (int argc, char *argv[]) {
     Editor E;
-    initEditor(&E);
+    init_editor(&E);
 
     if (argc >= 2) {
-        editorOpenFile(&E, argv[1]);
+        editor_open_file(&E, argv[1]);
     } else {
         // Append row to the first line to allow for typing
-        editorInsertRowBelow(&E, 0, "", 0);
+        editor_insert_row_below(&E, 0, "", 0);
     }
 
     while (true) {
-        editorRefresh(&E);
+        editor_refresh(&E);
         editor_process_key_press(&E, wgetch(stdscr));
     }
 }

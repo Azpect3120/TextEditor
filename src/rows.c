@@ -5,13 +5,13 @@
 
 // TODO: Check for errors in allocation
 
-void editorRemoveRow(Editor *E, const int pos) {
+void editor_remove_row(Editor *E, const int pos) {
     // Bounds check
     if (E->num_rows == 1 || pos >= E->num_rows || pos == 0) return;
 
     // Get the row we want to remove
     erow *row = &E->row[pos];
-    editorFreeRow(row);
+    editor_free_row(row);
 
     // Move the memory on top of the old row
     memmove(&E->row[pos], &E->row[pos + 1], sizeof(erow) * (E->num_rows - pos - 1));
@@ -19,14 +19,14 @@ void editorRemoveRow(Editor *E, const int pos) {
     // Generate new renders
     // TODO: If any render issues come along with deleting, check here
     for (int i = pos; i < E->num_rows; i++) {
-        editorRenderRow(&E->row[i]);
+        editor_render_row(&E->row[i]);
     }
 
     // Decrease the row count
     E->num_rows--;
 }
 
-void editorRenderRow(erow *row) {
+void editor_render_row(erow *row) {
     // Free the render
     // TODO: Might be better to reallocate here, to prevent some double freeing?
     if (row->render != NULL) free(row->render);
@@ -54,13 +54,13 @@ void editorRenderRow(erow *row) {
     row->rsize = idx;
 }
 
-void editorDrawRow(erow *row, int pos) {
+void editor_draw_row(erow *row, int pos) {
     // Render the row if it doesn't exist, should only have to happen on load.
-    if (row->render == NULL) editorRenderRow(row);
+    if (row->render == NULL) editor_render_row(row);
     mvwprintw(stdscr, pos, NUM_COL_SIZE, "%s", row->render);
 }
 
-void editorDrawRowNum(int cur_y, int pos, int offset) {
+void editor_draw_row_num(int cur_y, int pos, int offset) {
     int line_num = 0;
     char fmt[10];
 
@@ -82,13 +82,13 @@ void editorDrawRowNum(int cur_y, int pos, int offset) {
     attroff(COLOR_PAIR(2) | A_BOLD);
 }
 
-void editorFreeRow(erow *row) {
+void editor_free_row(erow *row) {
     if (row->chars != NULL) free(row->chars);
     // TODO: This was causing a double free when backspace pressed at x = 0
     // if (row->render != NULL) free(row->render);
 }
 
-void editorInsertRowBelow(Editor *E, int pos, char *s, size_t len) {
+void editor_insert_row_below(Editor *E, int pos, char *s, size_t len) {
     // Bounds check
     if (pos < 0 || pos > E->num_rows) return;
 
@@ -105,7 +105,7 @@ void editorInsertRowBelow(Editor *E, int pos, char *s, size_t len) {
         memcpy(E->row[i].chars, oldChars, oldSize);
         E->row[i].chars[oldSize] = '\0';
         E->row[i].size = oldSize;
-        editorRenderRow(&E->row[i]);
+        editor_render_row(&E->row[i]);
 
         free(oldChars);
     }
@@ -119,13 +119,13 @@ void editorInsertRowBelow(Editor *E, int pos, char *s, size_t len) {
     E->row[pos].chars[len] = '\0';
 
     // TODO: Create an updated render of the row
-    editorRenderRow(&E->row[pos]);
+    editor_render_row(&E->row[pos]);
 
     // Increment the number of rows
     E->num_rows++;
 }
 
-void editorInsertNewline(Editor *E) {
+void editor_insert_newline(Editor *E) {
     // Calculate previous line indentation
     size_t tabs = 0;
     if (E->cur_y > 0) {
@@ -140,8 +140,8 @@ void editorInsertNewline(Editor *E) {
     indent[tabs] = '\0';
 
     if (E->cur_x == 0) {
-        editorInsertRowBelow(E, E->cur_y, indent, tabs);
-        editorRenderRow(&E->row[E->cur_y]);
+        editor_insert_row_below(E, E->cur_y, indent, tabs);
+        editor_render_row(&E->row[E->cur_y]);
     } else {
         erow *row = &E->row[E->cur_y];
         // Create the new string with the appended tabs, +1 for null terminator
@@ -153,11 +153,11 @@ void editorInsertNewline(Editor *E) {
         strcat(newChars, &row->chars[E->cur_x]);
         newChars[len] = '\0';
 
-        editorInsertRowBelow(E, E->cur_y + 1, newChars, len);
-        editorRenderRow(&E->row[E->cur_y + 1]);
+        editor_insert_row_below(E, E->cur_y + 1, newChars, len);
+        editor_render_row(&E->row[E->cur_y + 1]);
         row = &E->row[E->cur_y];
         row->size = E->cur_x;
-        editorRenderRow(row);
+        editor_render_row(row);
     }
 
     E->dirty++;
@@ -166,7 +166,7 @@ void editorInsertNewline(Editor *E) {
     free(indent);
 }
 
-void rowAppendStr(Editor *E, erow *row, const char *s, const int len) {
+void row_append_str(Editor *E, erow *row, const char *s, const int len) {
     // Update size
     // TODO: Why do I need this silly 0 check?
     row->size = (row->size == 0) ? len : row->size + len;
@@ -182,16 +182,16 @@ void rowAppendStr(Editor *E, erow *row, const char *s, const int len) {
     E->cur_x = row->size - len;
 
     // Update the render in the row
-    editorRenderRow(row);
+    editor_render_row(row);
 }
 
-void editorInsertCharacter(Editor *E, const int x, const int y, const char c) {
+void editor_insert_character(Editor *E, const int x, const int y, const char c) {
     // Bounds check
     if (y < 0 || y >= E->num_rows) return;
     if (x < 0 || x > E->row[y].size) return;
     
     // If we are on the last (or first, on open), create a line below
-    if (y == E->num_rows) editorInsertRowBelow(E, y, "", 0);
+    if (y == E->num_rows) editor_insert_row_below(E, y, "", 0);
 
     // Get the row we are working with
     erow *row = &E->row[y];
@@ -217,10 +217,10 @@ void editorInsertCharacter(Editor *E, const int x, const int y, const char c) {
     E->dirty++;
 
     // Update the render in the row
-    editorRenderRow(row);
+    editor_render_row(row);
 }
 
-void editorRemoveCharacter(Editor *E, const int x, const int y) {
+void editor_remove_character(Editor *E, const int x, const int y) {
     // Get the row we are working with
     erow *row = &E->row[y];
 
@@ -230,11 +230,11 @@ void editorRemoveCharacter(Editor *E, const int x, const int y) {
     // If at pos 0 (start of line), we need to delete the line and move the content.
     if (x == 0) {
         if (row->size != 0 && y > 0) {
-            rowAppendStr(E, &E->row[y - 1], row->chars, row->size);
+            row_append_str(E, &E->row[y - 1], row->chars, row->size);
         } else {
             if (E->row != NULL) E->cur_x = E->row[E->cur_y - 1].size;
         }
-        editorRemoveRow(E, y);
+        editor_remove_row(E, y);
         if (E->cur_y > 0) E->cur_y--;
         return;
     }
@@ -256,10 +256,10 @@ void editorRemoveCharacter(Editor *E, const int x, const int y) {
     E->dirty++;
 
     // Update the render in the row
-    editorRenderRow(row);
+    editor_render_row(row);
 }
 
-int editorRowGetRenderX(erow *row, int cur_x) {
+int editor_row_get_render_x(erow *row, int cur_x) {
     int rx = 0;
     for (int i = 0; i < cur_x; i++) {
         if (row->chars[i] == '\t') rx += (TAB_STOP - 1) - (rx % TAB_STOP);

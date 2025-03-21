@@ -66,7 +66,7 @@ void editor_process_key_press(Editor *E, const int c) {
 
     // Ctrl-H is caught here
     if (c == KEY_BACKSPACE) {
-        editorRemoveCharacter(E, E->cur_x, E->cur_y);
+        editor_remove_character(E, E->cur_x, E->cur_y);
     } else if (c == KEY_DOWN) {
         action_move_cursor(E, DIRECTION_DOWN);
     } else if (c == KEY_UP) {
@@ -77,7 +77,7 @@ void editor_process_key_press(Editor *E, const int c) {
         action_move_cursor(E, DIRECTION_RIGHT);
     // Ctrl-M and Ctrl-J are caught here
     } else if (c == '\n' || c == KEY_ENTER || c == '\r') {
-        editorInsertNewline(E);
+        editor_insert_newline(E);
     // Keys between 1 and 26 SHOULD be control-characters
     } else if (iscntrl(c) && c >= 1 && c <= 26) {
         // Ctrl-C or Ctrl-Q: Quit
@@ -85,21 +85,21 @@ void editor_process_key_press(Editor *E, const int c) {
 
         // Ctrl-S: Save
         if (c == 19) {
-            editorSaveFile(E);
+            editor_save_file(E);
             return;
         }
 
         // Catch Ctrl-I as tab for some reason...
         if (c == 9) {
-            editorInsertCharacter(E, E->cur_x, E->cur_y, (char) c);
+            editor_insert_character(E, E->cur_x, E->cur_y, (char) c);
             return;
         }
 
         // TODO: Fix this with renders, right now, they are 2 characters
         // editorInsertCharacter(E->cur_x, E->cur_y, '^');
-        editorInsertCharacter(E, E->cur_x, E->cur_y, (char) (c | 0x40)); // Set the 6th bit (0x40 = 64)
+        editor_insert_character(E, E->cur_x, E->cur_y, (char) (c | 0x40)); // Set the 6th bit (0x40 = 64)
     } else {
-        editorInsertCharacter(E, E->cur_x, E->cur_y, (char) c);
+        editor_insert_character(E, E->cur_x, E->cur_y, (char) c);
     }
     return;
 }

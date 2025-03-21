@@ -121,9 +121,9 @@ void action_move_right(Editor *E) {
 
 void action_delete_char(Editor *E) {
     if ((E->cur_x) == E->row[E->cur_y].size) {
-        editorRemoveCharacter(E, E->cur_x, E->cur_y);
+        editor_remove_character(E, E->cur_x, E->cur_y);
     } else {
-        editorRemoveCharacter(E, E->cur_x + 1, E->cur_y);
+        editor_remove_character(E, E->cur_x + 1, E->cur_y);
         action_move_cursor(E, DIRECTION_RIGHT);
     }
 };
@@ -134,7 +134,7 @@ void action_quit(Editor *E) {
 };
 
 void action_save(Editor *E) {
-    editorSaveFile(E);
+    editor_save_file(E);
 };
 
 // ---- INSERT MORE ----
@@ -145,13 +145,13 @@ void action_normal_mode(Editor *E) {
 }
 
 void action_backspace(Editor *E) {
-    editorRemoveCharacter(E, E->cur_x, E->cur_y);
+    editor_remove_character(E, E->cur_x, E->cur_y);
 }
 
 void action_enter(Editor *E) {
-    editorInsertNewline(E);
+    editor_insert_newline(E);
 }
 
 void action_insert_character(Editor *E, const char c) {
-    editorInsertCharacter(E, E->cur_x, E->cur_y, c);
+    editor_insert_character(E, E->cur_x, E->cur_y, c);
 }

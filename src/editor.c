@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-void editorRefresh(Editor *E) {
+void editor_refresh(Editor *E) {
     // Update size state
     E->screen_rows = LINES;
     E->screen_cols = COLS;
@@ -21,7 +21,7 @@ void editorRefresh(Editor *E) {
     wclear(stdscr);
 
     // Update scroll values
-    editorScroll(E);
+    editor_scroll(E);
 
     // Calculate the height of the screen, based on the rows
     int view_height = E->screen_rows - 2;
@@ -29,30 +29,30 @@ void editorRefresh(Editor *E) {
     for (int y = 0; y < view_height; y++) {
         int row_index = E->view_start + y;
         if (row_index >= 0 && row_index < E->num_rows) {
-            editorDrawRowNum(E->cur_y - E->view_start,
+            editor_draw_row_num(E->cur_y - E->view_start,
                 row_index - E->view_start,
                 E->view_start);
-            editorDrawRow(&E->row[row_index], y);
+            editor_draw_row(&E->row[row_index], y);
         } else {
             mvwprintw(stdscr, y, 0, "~");
         }
     }
 
     // Draw status bar and message bar
-    editorDrawStatusBar(E);
-    editorDrawMessage(E);
+    editor_draw_status_bar(E);
+    editor_draw_message(E);
 
     // Move the cursor to the proper position defined in the state
     wmove(stdscr, E->cur_y - E->view_start, E->ren_x);
 }
 
-void editorScroll(Editor *E) {
+void editor_scroll(Editor *E) {
     // Prevent the cursor from being on the last blank character in NORMAL MODE
     if (E->mode == NORMAL_MODE && E->cur_x == E->row[E->cur_y].size && E->cur_x > 0) E->cur_x--;
 
     // Calculate render cursor position
     E->ren_x = 0;
-    if (E->cur_y < E->num_rows) E->ren_x = editorRowGetRenderX(&E->row[E->cur_y], E->cur_x);
+    if (E->cur_y < E->num_rows) E->ren_x = editor_row_get_render_x(&E->row[E->cur_y], E->cur_x);
 
     // Subtract status and message bars
     int view_height = E->screen_rows - 2;
@@ -73,7 +73,7 @@ void editorScroll(Editor *E) {
     }
 }
 
-void editorDrawStatusBar(Editor *E) {
+void editor_draw_status_bar(Editor *E) {
     char *status_f = (char *)malloc((E->screen_cols + 1) * sizeof(char));
     char status_l[160], status_r[40];
 
@@ -130,7 +130,7 @@ void editorDrawStatusBar(Editor *E) {
     free(status_f);
 }
 
-void editorDrawMessage(Editor *E) {
+void editor_draw_message(Editor *E) {
     // Clear the line before printing
     move(E->screen_rows - 1, 0);
     clrtoeol();
@@ -138,7 +138,7 @@ void editorDrawMessage(Editor *E) {
         mvwprintw(stdscr, E->screen_rows - 1, 0, "%s", E->message);
 }
 
-void editorSetStatusMessage(Editor *E, char *fmt, ...) {
+void editor_set_status_message(Editor *E, char *fmt, ...) {
     char *message = malloc(sizeof(char) * 80);
 
     va_list ap;
@@ -155,7 +155,7 @@ void editorSetStatusMessage(Editor *E, char *fmt, ...) {
     free(message);
 }
 
-void initEditor(Editor *E) {
+void init_editor(Editor *E) {
     // Initialize ncurses
     initscr();
     start_color();
@@ -192,20 +192,20 @@ void editor_destroy(Editor *E) {
     // TODO: Clear any memory allocated in the editor
 };
 
-void editorOpenFile(Editor *E, char *filename) {
+void editor_open_file(Editor *E, char *filename) {
     // Set the filename in the state
     free(E->filename);
     E->filename = strdup(filename);
 
     // Detect and update the filetype
-    editorDetectFileType(E);
+    editor_detect_file_type(E);
 
     // Open the file
     FILE *fp = fopen(filename, "r");
     if (!fp) {
         // Append row to the first line to allow for typing, same as in main
-        editorInsertRowBelow(E, 0, "", 0);
-        editorSetStatusMessage(E, "%s does not exist, it will be created on save.", E->filename);
+        editor_insert_row_below(E, 0, "", 0);
+        editor_set_status_message(E, "%s does not exist, it will be created on save.", E->filename);
         return;
     }
 
@@ -219,7 +219,7 @@ void editorOpenFile(Editor *E, char *filename) {
               (line[line_len - 1] == '\n' ||
                line[line_len - 1] == '\r')) line_len--;
 
-        editorInsertRowBelow(E, E->num_rows, line, line_len);
+        editor_insert_row_below(E, E->num_rows, line, line_len);
     }
 
 
@@ -228,22 +228,22 @@ void editorOpenFile(Editor *E, char *filename) {
     free(line);
 }
 
-void editorSaveFile(Editor *E) {
+void editor_save_file(Editor *E) {
     if (E->filename == NULL) {
-        char *filename = editorPrompt(E, "Enter a filename: %s", NULL);
+        char *filename = editor_prompt(E, "Enter a filename: %s", NULL);
         if (filename == NULL) {
-            editorSetStatusMessage(E, "Failed to save. Invalid file name.");
+            editor_set_status_message(E, "Failed to save. Invalid file name.");
             return;
         }
         E->filename = filename;
     }
 
     // Detect and update the filetype
-    editorDetectFileType(E);
+    editor_detect_file_type(E);
 
     // Convert the content to a string
     int len;
-    char *buf = editorContentToString(E, &len);
+    char *buf = editor_content_to_string(E, &len);
 
     int fd = open(E->filename, O_RDWR | O_CREAT, 0644);
     if (fd != -1) {
@@ -253,7 +253,7 @@ void editorSaveFile(Editor *E) {
             if (write(fd, buf, len) == len) {
                 close(fd);
                 free(buf);
-                editorSetStatusMessage(E, "%d bytes written to %s", len, E->filename);
+                editor_set_status_message(E, "%d bytes written to %s", len, E->filename);
                 E->dirty = 0;
                 return;
             }
@@ -262,10 +262,10 @@ void editorSaveFile(Editor *E) {
 
     // Catch error and free buffer
     free(buf);
-    editorSetStatusMessage(E, "Failed to save: %s", strerror(errno));
+    editor_set_status_message(E, "Failed to save: %s", strerror(errno));
 }
 
-void editorDetectFileType(Editor *E) {
+void editor_detect_file_type(Editor *E) {
     if (E->filename == NULL) return;
     char *dot = strrchr(E->filename, '.');
 
@@ -274,7 +274,7 @@ void editorDetectFileType(Editor *E) {
     E->filetype = ++dot;
 }
 
-char *editorContentToString(Editor *E, int *buf_len) {
+char *editor_content_to_string(Editor *E, int *buf_len) {
     // Compute total length and update passed value
     int tot_len = 0;
     for (int i = 0; i < E->num_rows; i++)
@@ -294,7 +294,7 @@ char *editorContentToString(Editor *E, int *buf_len) {
     return buf;
 }
 
-char *editorPrompt(Editor *E, char *prompt, void (*callback)(char *, int)) {
+char *editor_prompt(Editor *E, char *prompt, void (*callback)(char *, int)) {
     // TODO: Callback is ignored, implement it for searching
     // Create input buffer
     size_t buf_size = 128;
@@ -308,19 +308,19 @@ char *editorPrompt(Editor *E, char *prompt, void (*callback)(char *, int)) {
     ESCDELAY = 0;
 
     while (true) {
-        editorSetStatusMessage(E, prompt, buf);
-        editorRefresh(E);
+        editor_set_status_message(E, prompt, buf);
+        editor_refresh(E);
 
         int c = wgetch(stdscr);
         if (c == KEY_BACKSPACE) {
             if (buf_len > 0) buf[--buf_len] = '\0';
         } else if (c == '\n' || c == KEY_ENTER || c == '\r') {
-            editorSetStatusMessage(E, "");
+            editor_set_status_message(E, "");
             ESCDELAY = delay;
             return buf;
         // Catch ESC: There doesn't seem to be an escape key
         } else if (c == 27 || c == '\x1b') {
-            editorSetStatusMessage(E, "");
+            editor_set_status_message(E, "");
             ESCDELAY = delay;
             return NULL;
         } else if (!iscntrl(c) && c > 26) {
