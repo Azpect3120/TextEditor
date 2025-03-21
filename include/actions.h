@@ -10,9 +10,6 @@ typedef enum {
     DIRECTION_RIGHT
 } direction;
 
-// ---- UTIL ----
-int is_whitespace(char c);
-
 // ---- CURSOR ACTIONS ----
 
 void action_move_cursor(Editor *E, direction dir);
@@ -49,6 +46,6 @@ void action_normal_mode(Editor *E);
 void action_backspace(Editor *E);
 void action_enter(Editor *E);
 void action_insert_character(Editor *E, char c);
-
+void action_delete_last_word(Editor *E);
 
 #endif //ACTIONS_H

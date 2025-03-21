@@ -1,15 +1,8 @@
 #include "actions.h"
 #include "rows.h"
-#include <stddef.h>
 #include <stdbool.h>
-
-
-// ---- UTIL ----
-
-int is_whitespace(const char c) {
-    return (c == ' ' || c == '\t' || c == '\r');
-}
-
+#include <string.h>
+#include <ctype.h>
 
 // ---- CURSOR ACTIONS ----
 
@@ -54,7 +47,7 @@ void action_move_to_first_character(Editor *E) {
 
     int i;
     for (i = 0; i < row->size; i++)
-        if (!is_whitespace(row->chars[i])) break;
+        if (!isspace(row->chars[i])) break;
     E->cur_x = i;
 }
 
@@ -63,7 +56,7 @@ void action_move_to_last_character(Editor *E) {
 
     int i;
     for (i = row->size - 1; i > 0; i--)
-        if (!is_whitespace(row->chars[i])) break;
+        if (!isspace(row->chars[i])) break;
     E->cur_x = i + 1;
 }
 
@@ -187,11 +180,11 @@ void action_move_prev_word_start(Editor *E) {
     bool chars_found = false;
     for (i = E->cur_x; i > 0; i--) {
         if (row->chars[i] == ' ') space_found = true;
-        if (space_found && row->chars[i] != ' ') chars_found = true;
-        if (chars_found && space_found && row->chars[i] == ' ') break;
+        if (space_found && !isspace(row->chars[i])) chars_found = true;
+        if (chars_found && space_found && isspace(row->chars[i])) break;
     }
 
-    E->cur_x = ++i;
+    E->cur_x = (i == 0) ? i : ++i;
 
 }
 
@@ -227,4 +220,22 @@ void action_enter(Editor *E) {
 
 void action_insert_character(Editor *E, const char c) {
     editor_insert_character(E, E->cur_x, E->cur_y, c);
+}
+
+void action_delete_last_word(Editor *E) {
+    erow *row = &E->row[E->cur_y];
+
+    int i = E->cur_x;
+    // Skip trailing white space
+    // while (i > 0 && is_whitespace(row->chars[i])) i--;
+    while (i > 0 && isspace(row->chars[i])) i--;
+
+    // Find the beginning of the word
+    while (i > 0 && !isspace(row->chars[i])) i--;
+
+    // TODO: Maybe there is a better way? But maybe not!
+    int count = E->cur_x - i;
+    while (count-- > 0) {
+        action_delete_char(E);
+    }
 }

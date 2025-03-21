@@ -43,6 +43,7 @@ KeyMap insert_mode_keymaps[] = {
     {KEY_ENTER, action_enter},  // Enter
     {'\r', action_enter},       // Enter
     {'\n', action_enter},       // Enter
+    {23, action_delete_last_word}, // Ctrl-W
     {KEY_LEFT, action_move_left},
     {KEY_RIGHT, action_move_right},
     {KEY_UP, action_move_up},
@@ -53,7 +54,7 @@ KeyMap insert_mode_keymaps[] = {
 
 void editor_process_key_press(Editor *E, const int c) {
 
-    // editorSetStatusMessage(E, "Key pressed: '%c' (%d)", (c == '\n') ? ' ' : c, c);
+    // editor_set_status_message(E, "Key pressed: '%c' (%d)", (c == '\n') ? ' ' : c, c);
 
 
     switch (E->mode) {
