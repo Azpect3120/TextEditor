@@ -180,6 +180,7 @@ void init_editor(Editor *E) {
 
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
     init_pair(2, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(3, COLOR_BLACK, COLOR_YELLOW);
 
 
     // Set default colors
@@ -340,35 +341,47 @@ char *editor_prompt(Editor *E, char *prompt, void (*callback)(char *, int)) {
 bool editor_inside_selection(Editor *E, int x, int y) {
     VisualSelection *s = E->selection;
 
-    // Catch this, put it in the logic though
+    // duh!
     if (!s->active) return false;
 
+    switch (s->type) {
+        case VISUAL_CHAR:
+            // START is ABOVE END but not equal
+            if (s->start_y > s->end_y) {
+                // ON STARTING LINE
+                if (y == s->start_y) return (s->start_x <= x);
 
-    // START is ABOVE END but not equal
-    if (s->start_y > s->end_y) {
-        // ON STARTING LINE
-        if (y == s->start_y) return (s->start_x <= x);
+                // ON ENDING LINE
+                if (y == s->end_y) return (s->end_x >= x);
 
-        // ON ENDING LINE
-        if (y == s->end_y) return (s->end_x >= x);
+                // LINES BETWEEN THE END POINTS
+                return (s->start_y >= y && y >= s->end_y);
+            }
 
-        // LINES BETWEEN THE END POINTS
-        return (s->start_y >= y && y >= s->end_y);
+            // END is ABOVE START but not equal
+            if (s->start_y < s->end_y) {
+                // ON STARTING LINE
+                if (y == s->start_y) return (s->start_x <= x);
+
+                // ON ENDING LINE
+                if (y == s->end_y) return (s->end_x >= x);
+
+                // LINES BETWEEN THE END POINTS
+                return (s->end_y >= y && y >= s->start_y);
+            }
+
+
+            // START is END
+            return (s->start_x <= x && x <= s->end_x && (s->start_y == y && y == s->end_y));
+
+        case VISUAL_LINE:
+            // This one is simple, just worry about y coords
+            if (s->start_y >= s->end_y)
+                return (s->start_y >= y && y >= s->end_y);
+            return (s->end_y >= y && y >= s->start_y);
+
+        case VISUAL_BLOCK:
+            // TODO: Implement
+            return false;
     }
-
-    // END is ABOVE START but not equal
-    if (s->start_y < s->end_y) {
-        // ON STARTING LINE
-        if (y == s->start_y) return (s->start_x <= x);
-
-        // ON ENDING LINE
-        if (y == s->end_y) return (s->end_x >= x);
-
-        // LINES BETWEEN THE END POINTS
-        return (s->end_y >= y && y >= s->start_y);
-    }
-
-
-    // START is END
-    return (s->start_x <= x && x <= s->end_x && (s->start_y == y && y == s->end_y));
 }

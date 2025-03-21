@@ -60,9 +60,9 @@ void editor_draw_row(Editor *E, erow *row, int pos) {
 
     for (int x = 0; x < row->rsize; x++) {
         if (editor_inside_selection(E, x, pos)) {
-            attron(COLOR_PAIR(1));
+            attron(COLOR_PAIR(3));
             mvwprintw(stdscr, pos, NUM_COL_SIZE + x, "%c", row->render[x]);
-            attroff(COLOR_PAIR(1));
+            attroff(COLOR_PAIR(3));
         } else {
             mvwprintw(stdscr, pos, NUM_COL_SIZE + x, "%c", row->render[x]);
         }

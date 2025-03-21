@@ -32,7 +32,8 @@ KeyMap normal_mode_keymaps[] = {
     {KEY_BACKSPACE, action_move_left},
     {8, action_move_left},      // BACKSPACE
     {':', action_command_mode},
-    {'v', action_visual_mode},
+    {'v', action_visual_char_mode},
+    {'V', action_visual_line_mode},
 
     {0, NULL} // Null terminator: ALL MAPS MUST BE ABOVE THIS
 };
