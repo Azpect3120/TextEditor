@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
+#include <keymaps.h>
 
 // ---- CURSOR ACTIONS ----
 
@@ -139,15 +140,6 @@ void action_delete_char(Editor *E) {
     }
 };
 
-void action_quit(Editor *E) {
-    editor_destroy(E);
-    exit(0);
-};
-
-void action_save(Editor *E) {
-    editor_save_file(E);
-};
-
 void action_move_next_word_start(Editor *E) {
     erow *row = &E->row[E->cur_y];
 
@@ -207,15 +199,7 @@ void action_command_mode(Editor *E) {
     char *cmd = editor_prompt(E, ":%s", NULL);
     editor_set_status_message(E, cmd);
 
-    // TODO: Make this work the same way, but for now, ignore it
-    if (strcmp(cmd, "w") == 0) {
-        editor_save_file(E);
-    } else if (strcmp(cmd, "q") == 0) {
-        action_quit(E);
-    } else if (strcmp(cmd, "wq") == 0) {
-        editor_save_file(E);
-        action_quit(E);
-    }
+    execute_command(E, cmd);
 }
 
 // ---- INSERT MORE ----

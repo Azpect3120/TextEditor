@@ -91,8 +91,8 @@ void editor_draw_status_bar(Editor *E) {
         case INSERT_MODE:
             mode = "INSERT";
             break;
-        case COMMAND_MODE:
-            mode = "COMMAND";
+        case VISUAL_MODE:
+            mode = "VISUAL";
             break;
     }
 

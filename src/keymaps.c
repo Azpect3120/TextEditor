@@ -1,4 +1,7 @@
 #include "keymaps.h"
+
+#include <commands.h>
+
 #include "rows.h"
 #include "actions.h"
 #include <ncurses.h>
@@ -23,9 +26,6 @@ KeyMap normal_mode_keymaps[] = {
     {'k', action_move_up},
     {'l', action_move_right},
     {'x', action_delete_char},
-    // {3, action_quit},  // Ctrl-C
-    // {17, action_quit}, // Ctrl-Q
-    {19, action_save}, // Ctrl-S
     {KEY_ENTER, action_move_down}, // Enter
     {'\r', action_move_down},      // Enter
     {'\n', action_move_down},      // Enter
@@ -53,6 +53,15 @@ KeyMap insert_mode_keymaps[] = {
     {0, NULL} // Null terminator: ALL MAPS MUST BE ABOVE THIS
 };
 
+CmdMap command_mode_map[] = {
+    {"w", command_save},
+    {"wq", command_save_quit},
+    {"q", command_quit},
+    {"!q", command_force_quit},
+
+    {0, NULL} // Null terminator: ALL MAPS MUST BE ABOVE THIS
+};
+
 void editor_process_key_press(Editor *E, const int c) {
 
     // editor_set_status_message(E, "Key pressed: '%c' (%d)", (c == '\n') ? ' ' : c, c);
@@ -63,7 +72,8 @@ void editor_process_key_press(Editor *E, const int c) {
         case INSERT_MODE:
             execute_command_insert(E, c);
             break;
-        case COMMAND_MODE:
+        case VISUAL_MODE:
+            // TODO: Implement
             break;
     }
 }
@@ -90,3 +100,15 @@ int execute_command_insert(Editor *E, const int command) {
     return  0;
 }
 
+// TODO: This use direct strcmp, need a better way to select the commands
+int execute_command(Editor *E, char *command) {
+    for (int i = 0; command_mode_map[i].action != NULL; i++) {
+        if (strcmp(command_mode_map[i].command, command) == 0) {
+            command_mode_map[i].action(E, command);
+            return 0;
+        }
+    }
+
+    editor_set_status_message(E, "Unknown command: %s", command);
+    return -1;
+}

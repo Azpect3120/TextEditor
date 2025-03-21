@@ -13,7 +13,7 @@ if (CURSES_FOUND)
             src/editor.c
             src/keymaps.c
             src/actions.c
-            include/actions.h
+            src/commands.c
     )
     target_link_libraries(TextEditor ${CURSES_LIBRARIES})
 else()

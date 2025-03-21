@@ -10,7 +10,7 @@
 typedef enum {
     NORMAL_MODE,
     INSERT_MODE,
-    COMMAND_MODE
+    VISUAL_MODE
 } EditorMode;
 
 /**

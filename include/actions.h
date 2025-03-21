@@ -38,8 +38,6 @@ void action_move_down(Editor *E);
 void action_move_up(Editor *E);
 void action_move_right(Editor *E);
 void action_delete_char(Editor *E);
-void action_quit(Editor *E);
-void action_save(Editor *E);
 
 void action_command_mode(Editor *E);
 
