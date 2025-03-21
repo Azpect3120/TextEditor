@@ -93,6 +93,22 @@ void action_insert_mode_append_end(Editor *E) {
     action_move_to_end_of_line(E);
 };
 
+void action_insert_mode_below(Editor *E) {
+    // TODO: Why do I need +1?
+    editor_insert_row_below(E, E->cur_y + 1, "", 0);
+    E->cur_y++;
+    E->cur_x = 0;
+    E->mode = INSERT_MODE;
+}
+
+void action_insert_mode_above(Editor *E) {
+    editor_insert_row_above(E, E->cur_y, "", 0);
+    // We don't need to move the cursor down because creating the
+    // row will not move the cursor, which will seem like it is working
+    E->cur_x = 0;
+    E->mode = INSERT_MODE;
+}
+
 void action_move_start_line(Editor *E) {
     action_move_to_start_of_line(E);
 };

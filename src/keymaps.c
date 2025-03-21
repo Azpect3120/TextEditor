@@ -10,6 +10,8 @@ KeyMap normal_mode_keymaps[] = {
     {'I', action_insert_mode_start},
     {'a', action_insert_mode_append},
     {'A', action_insert_mode_append_end},
+    {'o', action_insert_mode_below},
+    {'O', action_insert_mode_above},
     {'w', action_move_next_word_start},
     {'b', action_move_prev_word_start},
     {'e', action_move_curr_word_end},

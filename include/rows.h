@@ -43,6 +43,16 @@ void editor_draw_row_num(int cur_y, int pos, int offset);
 void editor_free_row(erow *row);
 
 /**
+ * @brief Inserts a row above 'pos' with the content [ s + '\0' ]
+ * @param E Editor state
+ * @param pos Position the cursor is at, 0-indexed
+ * @param s String to append to the new row
+ * @param len Size of the string to append
+ * @note This function does NOT re-render, it just modifies the state.
+ */
+void editor_insert_row_above(Editor *E, int pos, char *s, size_t len);
+
+/**
  * @brief Inserts a row below 'pos' with the content [ s + '\0' ]
  * @param E Editor state
  * @param pos Position the cursor is at, 0-indexed

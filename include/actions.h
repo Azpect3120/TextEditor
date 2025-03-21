@@ -28,6 +28,8 @@ void action_insert_mode(Editor *E);
 void action_insert_mode_start(Editor *E);
 void action_insert_mode_append(Editor *E);
 void action_insert_mode_append_end(Editor *E);
+void action_insert_mode_below(Editor *E);
+void action_insert_mode_above(Editor *E);
 void action_move_start_line(Editor *E);
 void action_move_end_line(Editor *E);
 void action_move_first_char(Editor *E);

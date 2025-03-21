@@ -88,6 +88,43 @@ void editor_free_row(erow *row) {
     // if (row->render != NULL) free(row->render);
 }
 
+void editor_insert_row_above(Editor *E, int pos, char *s, size_t len) {
+    // Bounds check
+    if (pos < 0 || pos > E->num_rows) return;
+
+    // Reallocate enough memory for the new row
+    E->row = realloc(E->row, sizeof(erow) * (E->num_rows + 1));
+
+    // Move all memory (rows) after (below) the position back one to make room for the new row.
+    // We don't have to increment E.num_rows before this because num_rows stores 1 higher than the index (it's not 0 indexed)
+    for (int i = E->num_rows; i > pos; i--) {
+        int oldSize = E->row[i - 1].size;
+        char *oldChars = E->row[i - 1].chars;
+
+        E->row[i].chars = malloc(oldSize + 1);
+        memcpy(E->row[i].chars, oldChars, oldSize);
+        E->row[i].chars[oldSize] = '\0';
+        E->row[i].size = oldSize;
+        editor_render_row(&E->row[i]);
+
+        free(oldChars);
+    }
+
+    // Allocate memory for the new row, of size len + 1
+    // Plus one is for the '\0'
+    // Then, copy string into the new row and append '\0'
+    E->row[pos].size = len;
+    E->row[pos].chars = malloc(len + 1);
+    memcpy(E->row[pos].chars, s, len);
+    E->row[pos].chars[len] = '\0';
+
+    // TODO: Create an updated render of the row
+    editor_render_row(&E->row[pos]);
+
+    // Increment the number of rows
+    E->num_rows++;
+}
+
 void editor_insert_row_below(Editor *E, int pos, char *s, size_t len) {
     // Bounds check
     if (pos < 0 || pos > E->num_rows) return;
