@@ -32,7 +32,7 @@ void editor_refresh(Editor *E) {
             editor_draw_row_num(E->cur_y - E->view_start,
                 row_index - E->view_start,
                 E->view_start);
-            editor_draw_row(&E->row[row_index], y);
+            editor_draw_row(E, &E->row[row_index], y);
         } else {
             mvwprintw(stdscr, y, 0, "~");
         }
@@ -173,6 +173,7 @@ void init_editor(Editor *E) {
     E->screen_rows = LINES;
     E->screen_cols = COLS;
     E->mode = NORMAL_MODE;
+    E->selection = malloc(sizeof(VisualSelection));
 
     // Set esc to be handled instantly
     ESCDELAY = 0;
@@ -190,6 +191,7 @@ void editor_destroy(Editor *E) {
     endwin();
 
     // TODO: Clear any memory allocated in the editor
+    free(E->selection);
 };
 
 void editor_open_file(Editor *E, char *filename) {
@@ -333,4 +335,40 @@ char *editor_prompt(Editor *E, char *prompt, void (*callback)(char *, int)) {
             buf[buf_len] = '\0';
         }
     }
+}
+
+bool editor_inside_selection(Editor *E, int x, int y) {
+    VisualSelection *s = E->selection;
+
+    // Catch this, put it in the logic though
+    if (!s->active) return false;
+
+
+    // START is ABOVE END but not equal
+    if (s->start_y > s->end_y) {
+        // ON STARTING LINE
+        if (y == s->start_y) return (s->start_x <= x);
+
+        // ON ENDING LINE
+        if (y == s->end_y) return (s->end_x >= x);
+
+        // LINES BETWEEN THE END POINTS
+        return (s->start_y >= y && y >= s->end_y);
+    }
+
+    // END is ABOVE START but not equal
+    if (s->start_y < s->end_y) {
+        // ON STARTING LINE
+        if (y == s->start_y) return (s->start_x <= x);
+
+        // ON ENDING LINE
+        if (y == s->end_y) return (s->end_x >= x);
+
+        // LINES BETWEEN THE END POINTS
+        return (s->end_y >= y && y >= s->start_y);
+    }
+
+
+    // START is END
+    return (s->start_x <= x && x <= s->end_x && (s->start_y == y && y == s->end_y));
 }

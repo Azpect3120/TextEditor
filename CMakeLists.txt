@@ -14,6 +14,7 @@ if (CURSES_FOUND)
             src/keymaps.c
             src/actions.c
             src/commands.c
+            src/selection.c
     )
     target_link_libraries(TextEditor ${CURSES_LIBRARIES})
 else()

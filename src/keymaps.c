@@ -32,6 +32,7 @@ KeyMap normal_mode_keymaps[] = {
     {KEY_BACKSPACE, action_move_left},
     {8, action_move_left},      // BACKSPACE
     {':', action_command_mode},
+    {'v', action_visual_mode},
 
     {0, NULL} // Null terminator: ALL MAPS MUST BE ABOVE THIS
 };
@@ -50,6 +51,18 @@ KeyMap insert_mode_keymaps[] = {
     {KEY_RIGHT, action_move_right},
     {KEY_UP, action_move_up},
     {KEY_DOWN, action_move_down},
+
+    {0, NULL} // Null terminator: ALL MAPS MUST BE ABOVE THIS
+};
+
+KeyMap visual_mode_keymaps[] = {
+    {'h', action_move_selection_left},
+    {'j', action_move_selection_down},
+    {'k', action_move_selection_up},
+    {'l', action_move_selection_right},
+    {'\x1b', action_normal_mode},  // ESC
+    {27, action_normal_mode},      // ESC
+    {3, action_normal_mode},       // Ctrl-C
 
     {0, NULL} // Null terminator: ALL MAPS MUST BE ABOVE THIS
 };
@@ -74,7 +87,7 @@ void editor_process_key_press(Editor *E, const int c) {
             execute_command_insert(E, c);
             break;
         case VISUAL_MODE:
-            // TODO: Implement
+            execute_command_visual(E, c);
             break;
     }
 }
@@ -99,6 +112,17 @@ int execute_command_insert(Editor *E, const int command) {
     action_insert_character(E, (char) command);
 
     return  0;
+}
+
+// TODO: This is silly, since all the motions are the same, but for now its fine.
+int execute_command_visual(Editor *E, const int command) {
+    for (int i = 0; visual_mode_keymaps[i].action != NULL; i++) {
+        if (command == visual_mode_keymaps[i].key) {
+            visual_mode_keymaps[i].action(E);
+            return 0;
+        }
+    }
+    return  -1;
 }
 
 // TODO: This use direct strcmp, need a better way to select the commands

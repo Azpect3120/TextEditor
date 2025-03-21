@@ -1,6 +1,9 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
+#include "selection.h"
+#include <stdbool.h>
+
 #define TAB_STOP 4
 #define MESSAGE_TIMEOUT 5
 #define NUM_COL_SIZE 5
@@ -30,14 +33,14 @@ typedef struct erow {
     int rsize;
 
     /**
-     * @brief Content stored in the row.
+     * Content stored in the row.
      * @note Length should NEVER exceed the 'size' value.
      * @note These characters are used to generate the render, they should not be drawn directly.
      */
     char *chars;
 
     /**
-     * @brief Content that should be drawn.
+     * Content that should be drawn.
      * @note This value should be generated based on chars, before the screen is refreshed.
      */
     char *render;
@@ -82,13 +85,13 @@ typedef struct Editor {
     int cur_y;
 
     /**
-     * @brief Current x position of the cursor in the render.
+     * Current x position of the cursor in the render.
      * @note 0-indexed, where 0 is the left.
      */
     int ren_x;
 
     /**
-     * @brief The start of the view being rendered.
+     * The start of the view being rendered.
      * @note Gemini finally spat this solution out.
      */
     int view_start;
@@ -99,19 +102,19 @@ typedef struct Editor {
     char *message;
 
     /**
-     * @brief Stores the time of the last update to the message.
+     * Stores the time of the last update to the message.
      * @note Used to update the message on refresh.
      */
     int message_time;
 
     /**
-     * @brief Name of the file that is open, if none exists, the user will
+     * Name of the file that is open, if none exists, the user will
      * be prompt to enter one when saving.
      */
     char *filename;
 
     /**
-     * @brief Type of the file in the editor.
+     * Type of the file in the editor.
      * @note Stored as the file extension excluding the period.
      */
     char *filetype;
@@ -124,14 +127,16 @@ typedef struct Editor {
     int dirty;
 
     /**
-     * @brief Mode the editor is in.
+     * Mode the editor is in.
      * @note Mode will determine the way in which commands are parsed.
      */
     EditorMode mode;
+
+    VisualSelection *selection;
 } Editor;
 
 /**
- * @brief Refresh the editor and draw each row.
+ * Refresh the editor and draw each row.
  * @param E Editor state
  * @note This function draws '~' for unused lines.
  * @note This function also updates the editor size state.
@@ -139,7 +144,7 @@ typedef struct Editor {
 void editor_refresh(Editor *E);
 
 /**
- * @brief Handles the editors scroll functionality. As well as x-position.
+ * Handles the editors scroll functionality. As well as x-position.
  * @param E Editor state
  * @note Scroll-off constant is used to determine the scroll.
  * @note This function DOES NOT move the cursor, just updates the state.
@@ -148,7 +153,7 @@ void editor_refresh(Editor *E);
 void editor_scroll(Editor *E);
 
 /**
- * @brief Initialize the editor state object.
+ * Initialize the editor state object.
  * @param E Editor state
  */
 void init_editor(Editor *E);
@@ -156,7 +161,7 @@ void init_editor(Editor *E);
 void editor_destroy(Editor *E);
 
 /**
- * @brief Draw the status bar with the content pre-defined. No message here.
+ * Draw the status bar with the content pre-defined. No message here.
  * @param E Editor state
  * @note This will be called on each render.
  * @note This function will move the cursor, so it should be moved back after
@@ -165,7 +170,7 @@ void editor_destroy(Editor *E);
 void editor_draw_status_bar(Editor *E);
 
 /**
- * @brief Draw the message bar with the content in the editor state.
+ * Draw the message bar with the content in the editor state.
  * @param E Editor state
  * @note This will be called on each render.
  * @note This function will move the cursor, so it should be moved back after
@@ -174,7 +179,7 @@ void editor_draw_status_bar(Editor *E);
 void editor_draw_message(Editor *E);
 
 /**
- * @brief Update the message in the status bar.
+ * Update the message in the status bar.
  * @param E Editor state.
  * @param fmt Format specifier.
  * @param ... Optional arguments for the fmt.
@@ -184,14 +189,14 @@ void editor_set_status_message(Editor *E, char *fmt, ...);
 // TODO: MOVE THESE TO A FILES.C file
 
 /**
- * @brief Open a file and load it's content into the editor.
+ * Open a file and load it's content into the editor.
  * @param E Editor state
  * @param filename Name of the file to open
  */
 void editor_open_file(Editor *E, char *filename);
 
 /**
- * @brief Save the content in the editor to the file that is opened.
+ * Save the content in the editor to the file that is opened.
  * @param E Editor state
  * @note This function will set the dirty value to 0, indicating all changes
  * are saved.
@@ -225,5 +230,14 @@ char *editor_content_to_string(Editor *E, int *buf_len);
  * @note A string format specifier is expected to be in the prompt string.
  */
 char *editor_prompt(Editor *E, char *prompt, void (*callback)(char *,int));
+
+/**
+ * Determines if the position provided by x and y is inside the current selection.
+ * This will be used for highlighting.
+ * @param E Editor state
+ * @param x X position (0-indexed)
+ * @param y Y position (0-indexed)
+ */
+bool editor_inside_selection(Editor *E, int x, int y);
 
 #endif //EDITOR_H

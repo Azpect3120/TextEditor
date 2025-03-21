@@ -21,6 +21,7 @@ void action_move_to_last_line(Editor *E);
 void action_move_to_first_line(Editor *E);
 
 // ---- NORMAL MODE ----
+
 void action_insert_mode(Editor *E);
 void action_insert_mode_start(Editor *E);
 void action_insert_mode_append(Editor *E);
@@ -39,9 +40,11 @@ void action_move_up(Editor *E);
 void action_move_right(Editor *E);
 void action_delete_char(Editor *E);
 
+void action_visual_mode(Editor *E);
 void action_command_mode(Editor *E);
 
 // ---- INSERT MODE ----
+
 void action_normal_mode(Editor *E);
 void action_backspace(Editor *E);
 void action_enter(Editor *E);
@@ -49,6 +52,10 @@ void action_insert_character(Editor *E, char c);
 void action_delete_last_word(Editor *E);
 
 // ---- VISUAL MODE ----
-// TODO: IMPLEMENT VISUAL MODE
+
+void action_move_selection_left(Editor *E);
+void action_move_selection_right(Editor *E);
+void action_move_selection_up(Editor *E);
+void action_move_selection_down(Editor *E);
 
 #endif //ACTIONS_H

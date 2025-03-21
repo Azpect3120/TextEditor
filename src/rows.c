@@ -54,10 +54,19 @@ void editor_render_row(erow *row) {
     row->rsize = idx;
 }
 
-void editor_draw_row(erow *row, int pos) {
+void editor_draw_row(Editor *E, erow *row, int pos) {
     // Render the row if it doesn't exist, should only have to happen on load.
     if (row->render == NULL) editor_render_row(row);
-    mvwprintw(stdscr, pos, NUM_COL_SIZE, "%s", row->render);
+
+    for (int x = 0; x < row->rsize; x++) {
+        if (editor_inside_selection(E, x, pos)) {
+            attron(COLOR_PAIR(1));
+            mvwprintw(stdscr, pos, NUM_COL_SIZE + x, "%c", row->render[x]);
+            attroff(COLOR_PAIR(1));
+        } else {
+            mvwprintw(stdscr, pos, NUM_COL_SIZE + x, "%c", row->render[x]);
+        }
+    }
 }
 
 void editor_draw_row_num(int cur_y, int pos, int offset) {

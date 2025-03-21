@@ -27,7 +27,7 @@ void action_move_cursor(Editor *E, const direction dir) {
             if (E->cur_x > 0) E->cur_x--;
             break;
         case DIRECTION_RIGHT:
-            if (E->mode == INSERT_MODE)
+            if (E->mode == INSERT_MODE || E->mode == VISUAL_MODE)
                 if (E->row != NULL && E->cur_x < E->row[E->cur_y].size) E->cur_x++;
             if (E->mode == NORMAL_MODE)
                 if (E->row != NULL && E->cur_x < E->row[E->cur_y].size - 1) E->cur_x++;
@@ -206,6 +206,7 @@ void action_command_mode(Editor *E) {
 
 void action_normal_mode(Editor *E) {
     E->mode = NORMAL_MODE;
+    E->selection->active = false;
     action_move_cursor(E, DIRECTION_LEFT);
 }
 
@@ -237,4 +238,40 @@ void action_delete_last_word(Editor *E) {
         action_move_cursor(E, DIRECTION_LEFT);
         action_delete_char(E);
     }
+}
+
+void action_visual_mode(Editor *E) {
+    E->mode = VISUAL_MODE;
+    E->selection->active = true;
+
+    E->selection->start_x = E->cur_x;
+    E->selection->start_y = E->cur_y;
+
+    E->selection->end_x = E->cur_x;
+    E->selection->end_y = E->cur_y;
+}
+
+void action_move_selection_left(Editor *E) {
+    action_move_left(E);
+    E->selection->end_x = E->cur_x;
+    E->selection->end_y = E->cur_y;
+}
+
+void action_move_selection_right(Editor *E) {
+    action_move_right(E);
+    E->selection->end_x = E->cur_x;
+    E->selection->end_y = E->cur_y;
+}
+
+void action_move_selection_up(Editor *E) {
+    action_move_up(E);
+    E->selection->end_x = E->cur_x;
+    E->selection->end_y = E->cur_y;
+}
+
+void action_move_selection_down(Editor *E) {
+    action_move_down(E);
+    E->selection->end_x = E->cur_x;
+    E->selection->end_y = E->cur_y;
+
 }

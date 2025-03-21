@@ -39,6 +39,8 @@ int execute_command_normal(Editor *E, int command);
 
 int execute_command_insert(Editor *E, int command);
 
+int execute_command_visual(Editor *E, int command);
+
 int execute_command(Editor *E, char *command);
 
 #endif //KEYMAPS_H

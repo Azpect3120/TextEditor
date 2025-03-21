@@ -21,11 +21,12 @@ void editor_render_row(erow *row);
 
 /**
  * Write a 'row' to the buffer at 'pos.'
+ * @param E Editor state
  * @param row Row to render
  * @param pos Position in the buffer
  * @note The position will be offset by the NUM_COL_SIZE
  */
-void editor_draw_row(erow *row, int pos);
+void editor_draw_row(Editor *E, erow *row, int pos);
 
 /**
  * Draws the row number to the row at pos.
