@@ -174,6 +174,8 @@ void initEditor(Editor *E) {
     E->screen_cols = COLS;
     E->mode = NORMAL_MODE;
 
+    // Set esc to be handled instantly
+    ESCDELAY = 0;
 
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
     init_pair(2, COLOR_YELLOW, COLOR_BLACK);
@@ -182,6 +184,12 @@ void initEditor(Editor *E) {
     // Set default colors
     assume_default_colors(COLOR_WHITE, COLOR_BLACK);
     use_default_colors();
+}
+
+void editor_destroy(Editor *E) {
+    endwin();
+
+    // TODO: Clear any memory allocated in the editor
 };
 
 void editorOpenFile(Editor *E, char *filename) {

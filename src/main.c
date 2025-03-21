@@ -24,20 +24,8 @@ int main (int argc, char *argv[]) {
         editorInsertRowBelow(&E, 0, "", 0);
     }
 
-    int delay = ESCDELAY;
-    ESCDELAY = 0;
-
-    int exit = 0;
-    while (!exit) {
+    while (true) {
         editorRefresh(&E);
-        exit = editorProcessKeyPress(&E, wgetch(stdscr));
+        editor_process_key_press(&E, wgetch(stdscr));
     }
-
-    ESCDELAY = delay;
-
-
-    // TODO: Clear editor memory
-    // End ncurses mode
-    endwin();
-    return 0;
 }

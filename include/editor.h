@@ -153,6 +153,8 @@ void editorScroll(Editor *E);
  */
 void initEditor(Editor *E);
 
+void editor_destroy(Editor *E);
+
 /**
  * @brief Draw the status bar with the content pre-defined. No message here.
  * @param E Editor state

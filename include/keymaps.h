@@ -3,36 +3,31 @@
 
 #include "editor.h"
 
-typedef enum {
-    DIRECTION_UP,
-    DIRECTION_DOWN,
-    DIRECTION_LEFT,
-    DIRECTION_RIGHT
-} CursorDirection;
+/**
+* @brief Keymap struct which allows for easy mapping of keys
+*/
+typedef struct {
+    int key; // TODO: Might need to make this a string to handle multiple presses? Or maybe store the previous presses in a buffer?
+    void (*action)(Editor *E);
+} KeyMap;
 
 /**
- * Process the key presses
+ * @brief Process the key presses
  * @param E Editor state
  * @param c Key pressed
- * @return 1 for exit, 0 for nothing
  */
-int editorProcessKeyPress(Editor *E, const int c);
-
-// TODO: These should be able to handle multiple key presses, but for now just one
-int parse_command_normal(Editor *E, int command);
-int parse_command_insert(Editor *E, int command);
-int parse_command_command(Editor *E, int command);
-
-void editorSwitchMode(Editor *E, EditorMode new_mode);
+void editor_process_key_press(Editor *E, const int c);
 
 /**
- * @brief Move the cursor.
+ * @brief Execute a command in normal mode. The mappings are pre-defined.
  * @param E Editor state
- * @param dir Direction to move the cursor
- * @note This function handles bounds checking, do not worry about checking
- * before calling this function.
+ * @param command Key press or command to execute
+ * @return Status code
+ * @note Return codes: 0 = success; -1 = unknown command;
  */
-void moveCursor(Editor *E, CursorDirection dir);
+int execute_command_normal(Editor *E, int command);
+
+int execute_command_insert(Editor *E, int command);
 
 #endif //KEYMAPS_H
 
