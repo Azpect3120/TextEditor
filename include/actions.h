@@ -41,11 +41,16 @@ void action_delete_char(Editor *E);
 void action_quit(Editor *E);
 void action_save(Editor *E);
 
+void action_command_mode(Editor *E);
+
 // ---- INSERT MODE ----
 void action_normal_mode(Editor *E);
 void action_backspace(Editor *E);
 void action_enter(Editor *E);
 void action_insert_character(Editor *E, char c);
 void action_delete_last_word(Editor *E);
+
+// ---- VISUAL MODE ----
+// TODO: IMPLEMENT VISUAL MODE
 
 #endif //ACTIONS_H

@@ -203,6 +203,21 @@ void action_move_curr_word_end(Editor *E) {
     E->cur_x = --i;
 }
 
+void action_command_mode(Editor *E) {
+    char *cmd = editor_prompt(E, ":%s", NULL);
+    editor_set_status_message(E, cmd);
+
+    // TODO: Make this work the same way, but for now, ignore it
+    if (strcmp(cmd, "w") == 0) {
+        editor_save_file(E);
+    } else if (strcmp(cmd, "q") == 0) {
+        action_quit(E);
+    } else if (strcmp(cmd, "wq") == 0) {
+        editor_save_file(E);
+        action_quit(E);
+    }
+}
+
 // ---- INSERT MORE ----
 
 void action_normal_mode(Editor *E) {

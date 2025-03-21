@@ -23,14 +23,15 @@ KeyMap normal_mode_keymaps[] = {
     {'k', action_move_up},
     {'l', action_move_right},
     {'x', action_delete_char},
-    {3, action_quit},  // Ctrl-C
-    {17, action_quit}, // Ctrl-Q
+    // {3, action_quit},  // Ctrl-C
+    // {17, action_quit}, // Ctrl-Q
     {19, action_save}, // Ctrl-S
     {KEY_ENTER, action_move_down}, // Enter
     {'\r', action_move_down},      // Enter
     {'\n', action_move_down},      // Enter
     {KEY_BACKSPACE, action_move_left},
     {8, action_move_left},      // BACKSPACE
+    {':', action_command_mode},
 
     {0, NULL} // Null terminator: ALL MAPS MUST BE ABOVE THIS
 };
