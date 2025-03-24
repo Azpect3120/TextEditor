@@ -382,6 +382,13 @@ bool editor_inside_selection(Editor *E, int x, int y) {
 
         case VISUAL_BLOCK:
             // TODO: Implement
-            return false;
+            if (s->start_y <= s->end_y) {
+                if (s->start_x <= s->end_x)
+                    return (s->start_x <= x && x <= s->end_x) && (s->start_y <= y && y <= s->end_y);
+                return (s->end_x <= x && x <= s->start_x) && (s->start_y <= y && y <= s->end_y);
+            }
+            if (s->start_x <= s->end_x)
+                return (s->start_x <= x && x <= s->end_x) && (s->end_y <= y && y <= s->start_y);
+            return (s->end_x <= x && x <= s->start_x) && (s->end_y <= y && y <= s->start_y);
     }
 }

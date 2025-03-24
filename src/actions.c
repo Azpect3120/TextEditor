@@ -264,6 +264,18 @@ void action_visual_line_mode(Editor *E) {
     E->selection->end_y = E->cur_y;
 }
 
+void action_visual_block_mode(Editor *E) {
+    E->mode = VISUAL_MODE;
+    E->selection->active = true;
+    E->selection->type = VISUAL_BLOCK;
+
+    E->selection->start_x = E->cur_x;
+    E->selection->start_y = E->cur_y;
+
+    E->selection->end_x = E->cur_x;
+    E->selection->end_y = E->cur_y;
+}
+
 void action_move_selection_left(Editor *E) {
     action_move_left(E);
     E->selection->end_x = E->cur_x;

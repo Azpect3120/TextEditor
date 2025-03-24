@@ -42,6 +42,7 @@ void action_delete_char(Editor *E);
 
 void action_visual_char_mode(Editor *E);
 void action_visual_line_mode(Editor *E);
+void action_visual_block_mode(Editor *E);
 void action_command_mode(Editor *E);
 
 // ---- INSERT MODE ----

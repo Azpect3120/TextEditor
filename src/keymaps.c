@@ -34,6 +34,7 @@ KeyMap normal_mode_keymaps[] = {
     {':', action_command_mode},
     {'v', action_visual_char_mode},
     {'V', action_visual_line_mode},
+    {22, action_visual_block_mode},
 
     {0, NULL} // Null terminator: ALL MAPS MUST BE ABOVE THIS
 };
